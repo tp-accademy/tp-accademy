@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-86Ky0TDXJSlnrFx0R/6SZldWFhubviHciaUV4D27XhI=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-DsrX8xYS+f/zTabvjNBL0hd/Am+OkUdPsSRR+QwqHUA=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -199,6 +199,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 #read.full #rFs{position:fixed;top:12px;left:12px;z-index:5;background:rgba(22,25,30,.88)}
 #read.full .pdf{max-width:none;gap:10px}
 #read.full .pdf .pg{width:min(100%,calc(100vh * var(--ar)));align-self:center;border:0;border-radius:0}
+/* الزوم بالأصابع (بالسكربت): المتصفح ما يكبّر هو (pan بس)، والصفحات نفسها تكبر لعرض --pw، والقارئ يتسكرل بالعرض والطول */
+#read.full{touch-action:pan-x pan-y}
+#read.full .pdf.zoomed{width:max-content;min-width:100%}
+#read.full .pdf.zoomed .pg{width:var(--pw)}
+.atools #aZoom{font:700 13px "JetBrains Mono",monospace;color:var(--cy);direction:ltr}
 .pdf canvas{display:block;width:100%;height:100%}
 .pdf.lock{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 /* التأشير: طبقة فوگ كل صفحة (SVG للخطوط + ملاحظات)، تنرسم دائماً بس الأدوات تشتغل بملء الشاشة */
@@ -312,6 +317,8 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .qn{font-family:"JetBrains Mono";font-size:13px;color:var(--cy);margin-bottom:8px;direction:ltr;text-align:right}
 .qq{font-family:"Space Grotesk",Tajawal,sans-serif;font-size:19px;font-weight:700;line-height:1.75;margin-bottom:16px}
 .qopts{display:grid;gap:10px}
+.qopts.tf{grid-template-columns:1fr 1fr}
+.qopts.tf .qo{justify-content:center;font-family:Tajawal,sans-serif;font-size:19px;font-weight:800;padding:16px 12px}
 .qo{display:flex;align-items:center;gap:12px;text-align:start;padding:12px 14px;border-radius:11px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx);font:inherit;font-family:"Space Grotesk",Tajawal,sans-serif;font-size:16.5px;transition:.15s}
 .qo b{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);font-family:"JetBrains Mono";font-size:14px}
 .qo:hover:not(:disabled){border-color:var(--cy)}
@@ -528,7 +535,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
         <div class="f"><label for="ptopic" class="kw">موضوع البرزنتيشن</label><textarea id="ptopic" placeholder="اكتب الموضوع وأي تفاصيل يريدها الدكتور"></textarea></div>
         <div class="grid2">
           <div class="f"><label for="pslides" id="pslidesLbl">عدد السلايدات</label>
-            <div class="stepper"><button type="button" data-step="pslides:-1" aria-label="أقل">−</button><input id="pslides" type="number" inputmode="numeric" min="5" max="40" value="10"><button type="button" data-step="pslides:1" aria-label="أكثر">+</button></div><small id="pslidesHint">من 5 لـ 40</small></div>
+            <div class="stepper"><button type="button" data-step="pslides:-1" aria-label="أقل">−</button><input id="pslides" type="number" inputmode="numeric" min="5" max="40" value="5"><button type="button" data-step="pslides:1" aria-label="أكثر">+</button></div><small id="pslidesHint">من 5 لـ 40</small></div>
           <div class="f"><label for="pstud">عدد الطلاب بالمجموعة</label>
             <div class="stepper"><button type="button" data-step="pstud:-1" aria-label="أقل">−</button><input id="pstud" type="number" inputmode="numeric" min="1" max="10" value="1"><button type="button" data-step="pstud:1" aria-label="أكثر">+</button></div><small>من 1 لـ 10</small></div>
         </div>
@@ -610,6 +617,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
       <div class="g-nav">
         <button type="button" id="aPrev" title="السلايد السابق" aria-label="السلايد السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
         <span class="mono" id="aPage" aria-live="polite">1 / 1</span>
+        <button type="button" id="aZoom" title="رجّع الحجم الطبيعي" aria-label="رجّع الحجم الطبيعي" hidden>100%</button>
         <button type="button" id="aNext" title="السلايد الجاي" aria-label="السلايد الجاي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
         <button type="button" id="aMore" title="أدوات التأشير" aria-label="أدوات التأشير" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg></button>
       </div>
@@ -691,6 +699,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
     <div class="err" id="aErr"></div>
     <p class="okmsg" id="aOk" hidden></p>
     <div class="act"><button class="btn pri" type="submit" id="aGo"></button><button class="btn" type="button" data-for="acc" id="aOut">تسجيل خروج</button><button class="btn" type="button" id="aClose">رجوع</button></div>
+    <p class="note" id="aResendP" hidden><a href="#" id="aResend">دزلي رابط تأكيد جديد</a></p>
     <p class="note" data-for="in"><a href="#" id="aForgot">نسيت الرمز؟</a></p>
   </form>
 </div>
@@ -706,11 +715,12 @@ const WA_NUMBER = '9647746393895';  // رقم الواتساب بالصيغة ا
 /* Supabase: الحسابات والملازم والتأشير. المفتاح publishable عادي يكون علني، وأبداً لا تحط هنا الـ secret / service_role */
 const SB_URL = 'https://uetdxrqjuiuckvaxjkps.supabase.co';
 const SB_KEY = 'sb_publishable_diBdjXnB8hGs0jf703E1ug_nd34cnaf';
-/* السعر: الأساسي يغطي أول baseN سلايدات/صفحات، وكل وحدة زيادة perUnit، وكل طالب فوگ freeStudents ياخذ perStudent. ماكو حد أعلى */
+/* السعر: الأساسي يغطي أول baseN سلايدات/صفحات وطالب واحد، وكل وحدة زيادة perUnit.
+   الطالب الثاني يضيف secondStudent، والثالث وكل واحد بعده يضيف perStudent. ماكو حد أعلى */
 const PRICE = {
   p:{name:'برزنتيشن', base:5000, baseN:5, unit:'سلايد', units:'سلايدات'},
   r:{name:'تقرير', base:2000, baseN:3, unit:'صفحة', units:'صفحات'},
-  perUnit:250, freeStudents:3, perStudent:1000, maxN:40};
+  perUnit:250, secondStudent:500, perStudent:1000, maxN:40};
 /* الكورسات والمواد والملازم صارت بـ Supabase وتتعدل من لوحة الأدمن (#admin) */
 const STAGE_NAMES = ['المرحلة الأولى','المرحلة الثانية','المرحلة الثالثة','المرحلة الرابعة'];
 /* ================================== */
@@ -766,6 +776,15 @@ const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},s
 
 /* ===== Supabase: البيانات والحساب =====
    القوائم (كورسات/مواد/ملازم) تنقرا لأي واحد، بس ملف الملزمة ينفتح للطالب المسجل إذا الملزمة مجانية أو الكورس مفعّل إله (الصلاحيات بـ supabase/schema.sql) */
+/* روابط الإيميل (تأكيد الحساب، تغيير الرمز...) ترجع للموقع بـ #verify=<النوع>&th=<token_hash> (supabase/emails/make_emails.py)،
+   والموقع هو اللي يأكدها بـ verifyOtp. الرمز ينشال من الرابط فوراً حتى ما يبقى بالتاريخ.
+   old = الروابط القديمة (#access_token=...&type=...) اللي Supabase نفسه يدخل بيها */
+const AUTH_LINK=(()=>{
+  const h=new URLSearchParams(location.hash.slice(1));
+  if(h.get('verify')&&h.get('th')){history.replaceState(null,'',location.pathname+location.search+'#home');return {type:h.get('verify'),th:h.get('th')}}
+  if(h.get('access_token')&&h.get('type'))return {old:h.get('type')};
+  return null;
+})();
 const sb=window.supabase?supabase.createClient(SB_URL,SB_KEY):null;
 const DB={ok:false,err:'',courses:[],subjects:[],lectures:[],quizzes:[]};
 let ME=null; // {user, profile:{name,stage}, enr:Set(id الكورس), admin}
@@ -816,11 +835,17 @@ function refreshAll(){
   $('#buyBtn').href=payLink(null);
   renderTabs();renderCourses();
   const on=location.hash.slice(1).split('/')[0];
-  if(on==='read'||on==='admin'||on==='quiz')route();
+  // القارئ والاختبار ينفتحون من جديد بس إذا تغير الحساب أو تحمّلت البيانات، حتى حفظ الاسم ما يرجّع الاختبار من الأول
+  if(on==='admin'||((on==='read'||on==='quiz')&&routeKey()!==routedKey))route();
 }
+const routeKey=()=>`${DB.ok}:${ME?.user.id||''}`;
+let routedKey='';
 
 /* نافذة الحساب */
 let amode='in';
+// RECOV: دخل برابط تغيير الرمز، فلازم يكتب رمز جديد. إذا لغى يطلع من الحساب، وإذا حدّث الصفحة ترجعله النافذة
+let RECOV=false;
+const setRecov=on=>{RECOV=on;on&&ME?store.set('tp-recov',ME.user.id):store.del('tp-recov')};
 const AM={in:['تسجيل دخول','دخول'],up:['حساب جديد','سوّي الحساب'],forgot:['نسيت الرمز','دزلي رابط'],newpass:['رمز جديد','احفظ الرمز'],acc:['حسابي','احفظ']};
 function openAuth(m,why){
   amode=m||(ME?'acc':'in');
@@ -828,7 +853,8 @@ function openAuth(m,why){
   $('#aWhy').textContent=why||'';$('#aWhy').hidden=!why;
   document.querySelectorAll('#aform [data-for]').forEach(el=>el.hidden=!el.dataset.for.split(' ').includes(amode));
   document.querySelectorAll('[data-am]').forEach(b=>b.setAttribute('aria-checked',b.dataset.am===amode));
-  $('#aErr').textContent='';$('#aOk').hidden=true;$('#aGo').hidden=false;$('#aPass').value='';
+  $('#aErr').textContent='';$('#aOk').hidden=true;$('#aGo').hidden=false;$('#aPass').value='';$('#aResendP').hidden=true;
+  $('#aClose').textContent=amode==='newpass'&&RECOV?'إلغاء وتسجيل خروج':'رجوع';
   $('#aPass').autocomplete=amode==='in'?'current-password':'new-password';
   if(amode==='acc'){
     $('#aMail').textContent=ME.user.email;$('#aName').value=ME.profile.name||'';$('#aStage').value=ME.profile.stage||'';
@@ -838,7 +864,10 @@ function openAuth(m,why){
   $('#amodal').classList.add('on');
   setTimeout(()=>document.querySelector('#aform .f:not([hidden]) input')?.focus(),30);
 }
-const closeAuth=()=>$('#amodal').classList.remove('on');
+function closeAuth(){
+  if(RECOV&&amode==='newpass'&&$('#amodal').classList.contains('on')){setRecov(false);sb.auth.signOut()}
+  $('#amodal').classList.remove('on');
+}
 // الخلفية المتحركة تنتقل داخل نافذة الحساب وهي مفتوحة (حتى بالقارئ)، وترجع للصفحة لما تنسد بأي طريقة
 new MutationObserver(()=>{const m=$('#amodal'),bg=$('#bg');if(!$('#intro'))m.classList.contains('on')?m.prepend(bg):document.body.prepend(bg)}).observe($('#amodal'),{attributes:true,attributeFilter:['class']});
 $('#acct').onclick=()=>openAuth();
@@ -868,17 +897,42 @@ $('#aform').onsubmit=async e=>{
       const r=await sb.auth.signUp({email,password:pass,options:{data:{name,stage},emailRedirectTo:SITE}});if(r.error)throw r.error;
       if(r.data.user&&!r.data.user.identities?.length)err(AERR['User already registered']);
       else if(r.data.session)closeAuth();
-      else{ok('سوّينالك الحساب! دزينالك رسالة على الإيميل، اضغط الرابط اللي بيها حتى يتفعل حسابك، وبعدها سجّل دخول.');$('#aGo').hidden=true}
+      else{ok('سوّينالك الحساب! دزينالك رسالة على الإيميل، اضغط الزر اللي بيها ويتفعل حسابك وتدخل. إذا ما لكيتها شوف مجلد Spam (البريد غير الهام).');$('#aGo').hidden=true}
     }
-    else if(amode==='forgot'){const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:SITE});if(r.error)throw r.error;ok('إذا الإيميل عنده حساب، راح توصله رسالة بيها رابط تغيير الرمز.');$('#aGo').hidden=true}
-    else if(amode==='newpass'){const r=await sb.auth.updateUser({password:pass});if(r.error)throw r.error;ok('تغيّر الرمز.');$('#aGo').hidden=true}
+    else if(amode==='forgot'){const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:SITE});if(r.error)throw r.error;ok('إذا الإيميل عنده حساب، راح توصله رسالة بيها رابط تغيير الرمز. إذا ما لكيتها شوف مجلد Spam (البريد غير الهام).');$('#aGo').hidden=true}
+    else if(amode==='newpass'){const r=await sb.auth.updateUser({password:pass});if(r.error)throw r.error;setRecov(false);$('#aClose').textContent='تمام';ok('تغيّر الرمز، وصرت داخل بحسابك.');$('#aGo').hidden=true}
     else if(amode==='acc'){
       const r=await sb.from('profiles').update({name,stage:+stage}).eq('id',ME.user.id);if(r.error)throw r.error;
       ME.profile={name,stage:+stage};ok('انحفظ.');refreshAll();
     }
-  }catch(x){err(aErr(x))}
+  }catch(x){err(aErr(x));if(amode==='in'&&x.message==='Email not confirmed')$('#aResendP').hidden=false}
   $('#aGo').disabled=false;
 };
+// الحساب ما متأكد (الرابط ضاع أو انتهى): يدزله رابط تأكيد جديد
+$('#aResend').onclick=async e=>{
+  e.preventDefault();const email=$('#aEmail').value.trim();if(!email)return;
+  $('#aResendP').hidden=true;
+  const r=await sb.auth.resend({type:'signup',email,options:{emailRedirectTo:SITE}});
+  if(r.error)return $('#aErr').textContent=aErr(r.error);
+  $('#aErr').textContent='';$('#aOk').textContent='دزينالك رابط تأكيد جديد. افتح الإيميل واضغط الزر (وإذا ما لكيته شوف مجلد Spam / البريد غير الهام).';$('#aOk').hidden=false;
+};
+/* لما يفتح رابط الإيميل: نأكد الرمز ويدخل لحسابه، وإذا الرابط لتغيير الرمز تنفتح نافذة الرمز الجديد ولازم يكتبه */
+const OTP_TYPE={signup:'email',magiclink:'email',email:'email',recovery:'recovery',invite:'invite',email_change:'email_change'};
+async function verifyLink({type,th}){
+  const rec=type==='recovery';
+  if(!OTP_TYPE[type])return openAuth('in','هذا الرابط مو صحيح. سجّل دخول، وإذا ما گدرت راسلنا.');
+  const r=await sb.auth.verifyOtp({token_hash:th,type:OTP_TYPE[type]});
+  if(r.error){
+    console.warn(r.error);
+    return rec?openAuth('forgot','رابط تغيير الرمز انتهى أو انستخدم قبل. اكتب إيميلك ونحن ندزلك رابط جديد.')
+      :openAuth('in','هذا الرابط انتهى أو انستخدم قبل. إذا أكدت حسابك قبل، سجّل دخول عادي. وإذا لا، سجّل دخول ويطلعلك زر يدزلك رابط جديد.');
+  }
+  // بعض الروابط تنقبل بدون ما تدخّل (مثل أول تأكيد من ثنين لتغيير الإيميل)، فبدون جلسة نكتفي برسالة
+  if(!r.data?.session)return openAuth(ME?'acc':'in',type==='email_change'?'انقبل التأكيد. إذا وصلك رابط ثاني على الإيميل الثاني، افتحه هم حتى يكمل التغيير.':'انقبل الرابط. سجّل دخول حتى تكمل.');
+  await loadMe(r.data.session);refreshAll();
+  if(rec){setRecov(true);return openAuth('newpass','اكتب رمز جديد لحسابك (8 أحرف أو أكثر). بدونه ما تكمل.')}
+  openAuth('acc',type==='email_change'?'تغيّر إيميل حسابك.':`تأكد إيميلك وصار حسابك جاهز!${ME.profile.stage?'':' اختار مرحلتك حتى نفتحلك ملازمها أول شي.'}`);
+}
 
 /* pages: كل رابط بالقائمة يفتح صفحته لحالها، والقارئ: #read/<id الملزمة> */
 function route(){
@@ -891,6 +945,7 @@ function route(){
   document.querySelectorAll('nav a').forEach(a=>a.hash==='#'+navOn?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
   if(on==='read')openReader(+args[0]);else{readJob++;annFlush();$('#pdf').innerHTML='';if(fsOn())exitFs()}
   if(on==='quiz')openQuiz(+args[0]);else{qzJob++;QZ=null}
+  routedKey=routeKey();
   if(on==='admin')renderAdmin();
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -903,6 +958,7 @@ let dlUrl='';
 async function openReader(id){
   const job=++readJob,box=$('#pdf'),msg=(t,act)=>{if(job===readJob)box.innerHTML=`<div class="empty">${t}${act?`<div class="cta" style="justify-content:center;margin-top:14px">${act}</div>`:''}</div>`};
   annFlush();$('#rDl').hidden=true;if(dlUrl){URL.revokeObjectURL(dlUrl);dlUrl=''}
+  setZoom(1); // الزوم ما ينتقل لملزمة ثانية
   if(!DB.ok){$('#rTitle').textContent='';$('#rLab').textContent='';$('#rLecs').innerHTML='';return msg(DB.err||'جاري التحميل...')}
   const lec=lecById(id),sub=lec&&subById(lec.subject_id),c=sub&&courseById(sub.course_id);
   $('#rTitle').innerHTML=sub?`<bdi>${esc(sub.name)}</bdi>`:'';$('#rLab').textContent=c?`${STAGE_NAMES[c.stage-1]} · ${c.name}`:'';
@@ -924,16 +980,25 @@ async function openReader(id){
     box.innerHTML='';box.style.setProperty('--ar',first.width/first.height);
     // الملزمة المدفوعة عليها إيميل الطالب باهت، حتى إذا أحد صوّرها ونشرها يبين منو
     const wm=lec.free?'':Array(3).fill(`<b>${esc(ME.user.email)}</b>`).join('');
+    // الصفحة تنرسم لما تقترب من الشاشة، ولما تبعد هواية كانفاسها ينمسح حتى الذاكرة ما تخلص
+    // (سفاري بالآيفون والآيباد يوقف رسم الكانفاس أو يعيد تحميل الصفحة إذا تعدت ~384 ميگا، والملزمة الطويلة وياها الزوم تتعداها)
+    const drop=d=>{const c=d.querySelector('canvas');if(c){c.width=c.height=0;c.remove()}d._w=0;d._job=(d._job||0)+1};
     const io=new IntersectionObserver(es=>es.forEach(async en=>{
-      if(!en.isIntersecting||job!==readJob)return;io.unobserve(en.target);
-      const page=await doc.getPage(+en.target.dataset.n),vp1=page.getViewport({scale:1});
-      const vp=page.getViewport({scale:en.target.clientWidth*Math.min(devicePixelRatio||1,2)/vp1.width});
+      const d=en.target;if(job!==readJob)return;
+      if(!en.isIntersecting)return drop(d);
+      const w=d.clientWidth;if(d._w===w)return; // مرسومة بنفس الحجم
+      const my=d._job=(d._job||0)+1;d._w=w;
+      const page=await doc.getPage(+d.dataset.n),vp1=page.getViewport({scale:1});
+      // وقت الزوم الصفحة تكبر هواية، فالدقة إلها حد (8 مليون بكسل للصفحة)
+      const vp=page.getViewport({scale:Math.min(w*Math.min(devicePixelRatio||1,2)/vp1.width,Math.sqrt(8e6/(vp1.width*vp1.height)))});
       const cv=document.createElement('canvas');cv.width=vp.width;cv.height=vp.height;
       await page.render({canvasContext:cv.getContext('2d'),viewport:vp}).promise;
-      if(job===readJob){en.target.querySelector('canvas')?.remove();en.target.appendChild(cv)}
+      if(job!==readJob||d._job!==my){cv.width=cv.height=0;return} // انطلبت رسمة أحدث أو ابتعدت
+      const old=d.querySelector('canvas');if(old){old.width=old.height=0;old.remove()}
+      d.appendChild(cv);
     }),{rootMargin:'900px 0px'});
-    // لما يتغير حجم الصفحات (ملء الشاشة) نرسمها من جديد بالحجم الجديد حتى تبقى واضحة
-    redraw=()=>box.querySelectorAll('.pg').forEach(d=>io.observe(d));
+    // لما يتغير حجم الصفحات (ملء الشاشة أو الزوم) نرسم القريبة من جديد بالحجم الجديد حتى تبقى واضحة
+    redraw=()=>box.querySelectorAll('.pg').forEach(d=>{io.unobserve(d);io.observe(d)});
     for(let n=1;n<=doc.numPages;n++){
       const d=document.createElement('div');d.className='pg';d.dataset.n=n;d.style.aspectRatio=`${first.width}/${first.height}`;
       d.innerHTML=`<span class="pn">${n} / ${doc.numPages}</span>`+(wm?`<span class="wmk" aria-hidden="true">${wm}</span>`:'');annPaint(d);
@@ -952,7 +1017,7 @@ function fsLabel(){
   const on=fsOn(),pg=fsPage||curPage();fsPage=null;
   $('#rFs').textContent=on?'طلوع من ملء الشاشة':'ملء الشاشة';
   if(rd.classList.contains('full')===on)return;
-  if(!on)finishEdit();
+  if(!on){finishEdit();setZoom(1)}
   rd.classList.toggle('full',on);
   requestAnimationFrame(()=>{if(pg)pg.scrollIntoView({block:'start',behavior:'instant'});redraw();pageLabel()});
 }
@@ -967,7 +1032,7 @@ $('#rFs').onclick=async()=>{
   fsLabel();
 };
 ['fullscreenchange','webkitfullscreenchange'].forEach(ev=>document.addEventListener(ev,fsLabel));
-addEventListener('resize',()=>{if(rd.classList.contains('full'))redraw()});
+addEventListener('resize',()=>{if(rd.classList.contains('full')){setZoom(Z);redraw()}});
 
 /* التأشير بملء الشاشة: هايلايتر، قلم، ملاحظات نصية، ممحاة (جزئي أو خط كامل)، وتراجع. ينحفظ بحساب الطالب لكل ملزمة (جدول annotations بـ Supabase).
    الإحداثيات والأحجام بوحدات عرض الصفحة = 1000، فالتأشير يبقى بمكانه وحجمه مهما تغير حجم الصفحة.
@@ -1074,6 +1139,7 @@ function annErase(pg,[x,y]){
 }
 const pdfBox=$('#pdf'),ecur=$('#ecur');
 pdfBox.addEventListener('pointerdown',e=>{
+  if((e.pointerType==='touch'&&!e.isPrimary)||pinch){annCancel();return} // صبع ثاني = زوم، مو رسم
   if(!rd.classList.contains('full')||tool==='none')return;
   const noteEl=e.target.closest('.anote');
   if(noteEl&&noteEl.classList.contains('ed')&&!e.target.closest('.nmove'))return; // كتابة داخل الملاحظة
@@ -1101,7 +1167,7 @@ pdfBox.addEventListener('pointermove',e=>{
     const pg=e.target.closest('.pg');ecur.classList.toggle('on',!!pg);
     if(pg){const d=SIZE.erase*pg.clientWidth/1000;ecur.style.cssText=`left:${e.clientX}px;top:${e.clientY}px;width:${d}px;height:${d}px`}
   }
-  if(!drawing)return;e.preventDefault();
+  if(!drawing||pinch)return;e.preventDefault();
   if(drawing.erase){const ov=drawing.pg.querySelector('.ann');annErase(drawing.pg,annPt(e,ov));return}
   if(drawing.move){
     const [px,py]=annPt(e,drawing.ov),dx=px-drawing.from[0],dy=py-drawing.from[1],H=1000/ANN.ar;
@@ -1121,6 +1187,51 @@ function annEnd(){
   if(!d.erase){snap();annPage(+d.pg.dataset.n).s.push(d.s);annSave()}
 }
 pdfBox.addEventListener('pointerup',annEnd);pdfBox.addEventListener('pointercancel',annEnd);
+// إذا بدا يرسم بصبع وبعدين حط الصبع الثاني (زوم)، الشي اللي بدا بيه يتلغى ويرجع مثل ما چان
+function annCancel(){
+  const d=drawing;if(!d)return;drawing=null;
+  if(d.move){if(d.moved){ANN.hist.pop();[d.x.x,d.x.y]=d.orig;noteStyle(d.el,d.x,1000/ANN.ar)}return}
+  if(d.erase){if(d.erased){ANN.data=JSON.parse(ANN.hist.pop());annSave();annRepaint()}return}
+  d.el?.remove();
+}
+
+/* الزوم بالأصابع بملء الشاشة: المتصفحات ما تسمح زوم الصفحة داخل ملء الشاشة (وبالآيفون الشاشة fixed)، فنسويه إحنا:
+   صبعين يكبرون الصفحات نفسها (لحد 4×)، والنقطة اللي بين الصبعين تبقى تحتهم (فالسحب بالصبعين يحرّك هم)،
+   وبعد ما يشيل إيده الصفحات تنرسم بالدقة الجديدة. بالحاسبة: Ctrl + عجلة الماوس أو صبعين على التاچ باد.
+   التأشير بوحدات عرض الصفحة، فيكبر وياها ويبقى بمكانه */
+let Z=1,pinch=null,zT=0;
+function setZoom(z,cx,cy,a){
+  z=Math.max(1,Math.min(4,z||1));if(z<1.03)z=1;Z=z;
+  if(z===1){pdfBox.classList.remove('zoomed');pdfBox.style.removeProperty('--pw')}
+  else{pdfBox.classList.add('zoomed');pdfBox.style.setProperty('--pw',Math.min(rd.clientWidth,innerHeight*(+pdfBox.style.getPropertyValue('--ar')||1))*z+'px')}
+  if(a){const r=a.pg.getBoundingClientRect();rd.scrollLeft+=r.left+a.rx*r.width-cx;rd.scrollTop+=r.top+a.ry*r.height-cy}
+  $('#aZoom').hidden=z===1;$('#aZoom').textContent=Math.round(z*100)+'%';
+}
+// النقطة (كنسبة من الصفحة اللي تحتها) اللي لازم تبقى تحت الأصابع أو الماوس
+function zAnchor(x,y){
+  const pg=[...pdfBox.querySelectorAll('.pg')].find(p=>{const r=p.getBoundingClientRect();return y>=r.top&&y<=r.bottom})||curPage();
+  if(!pg)return null;const r=pg.getBoundingClientRect();return {pg,rx:(x-r.left)/r.width,ry:(y-r.top)/r.height};
+}
+const tMid=t=>[(t[0].clientX+t[1].clientX)/2,(t[0].clientY+t[1].clientY)/2],tDist=t=>Math.hypot(t[0].clientX-t[1].clientX,t[0].clientY-t[1].clientY)||1;
+rd.addEventListener('touchstart',e=>{
+  if(!rd.classList.contains('full')||e.touches.length!==2||e.target.closest('.atools,.aconf'))return;
+  annCancel();const [x,y]=tMid(e.touches);pinch={d:tDist(e.touches),z:Z,a:zAnchor(x,y)};
+  if(e.cancelable)e.preventDefault();
+},{passive:false});
+rd.addEventListener('touchmove',e=>{
+  if(!pinch)return;if(e.cancelable)e.preventDefault();if(e.touches.length<2)return;
+  const [x,y]=tMid(e.touches);setZoom(pinch.z*tDist(e.touches)/pinch.d,x,y,pinch.a);
+},{passive:false});
+const pinchEnd=e=>{if(pinch&&e.touches.length<2){pinch=null;redraw();pageLabel()}};
+rd.addEventListener('touchend',pinchEnd);rd.addEventListener('touchcancel',pinchEnd);
+// سفاري (آيفون/آيباد) عنده زوم خاص بيه، نوقفه بملء الشاشة حتى يشتغل زومنا
+['gesturestart','gesturechange'].forEach(ev=>rd.addEventListener(ev,e=>{if(rd.classList.contains('full'))e.preventDefault()}));
+rd.addEventListener('wheel',e=>{
+  if(!rd.classList.contains('full')||!e.ctrlKey)return;e.preventDefault();
+  setZoom(Z*Math.exp(-e.deltaY/200),e.clientX,e.clientY,zAnchor(e.clientX,e.clientY));
+  clearTimeout(zT);zT=setTimeout(()=>{redraw();pageLabel()},250);
+},{passive:false});
+$('#aZoom').onclick=()=>{const p=curPage();setZoom(1);rd.scrollLeft=0;if(p)p.scrollIntoView({block:'start',behavior:'instant'});redraw()};
 /* الحجم: لكل أداة حجمها، والنقطة يم الشريط تبين الحجم الحقيقي على الصفحة. وقت تعديل ملاحظة يغير حجم خطها ولونها */
 function setSize(v,quiet){
   const t=tool==='none'?'pen':tool;v=Math.max(SMIN[t],Math.min(SMAX[t],+v));SIZE[t]=v;
@@ -1211,7 +1322,9 @@ function setKind(k){
   document.querySelectorAll('[data-kind]').forEach(b=>b.setAttribute('aria-checked',b.dataset.kind===k));
   document.querySelectorAll('#pform .kw').forEach(l=>l.textContent=l.textContent.replace(/البرزنتيشن|التقرير/,'ال'+(k==='p'?'برزنتيشن':'تقرير')));
   $('#pslidesLbl').textContent=`عدد ال${t.units}`;$('#pslides').min=t.baseN;$('#pslides').max=PRICE.maxN;$('#pslidesHint').textContent=`من ${t.baseN} لـ ${PRICE.maxN}`;
-  $('#prule').innerHTML=`<b>شلون ينحسب؟</b> ${fmt(t.base)} أساسي لأول ${t.baseN} ${t.units}، و${fmt(PRICE.perUnit)} لكل ${t.unit} زيادة، و${fmt(PRICE.perStudent)} لكل طالب فوگ الثلاثة.`;
+  $('#prule').innerHTML=`<b>شلون ينحسب؟</b> ${fmt(t.base)} أساسي لأول ${t.baseN} ${t.units}، و${fmt(PRICE.perUnit)} لكل ${t.unit} زيادة، والطالب الثاني ${fmt(PRICE.secondStudent)}، والثالث وكل طالب بعده ${fmt(PRICE.perStudent)}.`;
+  // عدد السلايدات/الصفحات يبدي من الأساسي، وإذا بعده على أساسي النوع الثاني ينقلب لأساسي هذا النوع
+  const sl=$('#pslides');if(+sl.value===PRICE[k==='p'?'r':'p'].baseN||!sl.value)sl.value=t.baseN;
   calc();
 }
 /* خانات أسماء الطلاب: وحدة لكل طالب بعد الأول، والمكتوب يبقى إذا تغير العدد */
@@ -1225,11 +1338,11 @@ function renderNames(st){
 function calc(){
   const t=K(),sl=clampInput('pslides'),st=clampInput('pstud');
   if($('#pnames').children.length!==st-1)renderNames(st);
-  const xS=Math.max(0,sl-t.baseN),xT=Math.max(0,st-PRICE.freeStudents);
-  const exS=xS*PRICE.perUnit, exT=xT*PRICE.perStudent, tot=t.base+exS+exT;
+  const xS=Math.max(0,sl-t.baseN),xT=Math.max(0,st-1);
+  const exS=xS*PRICE.perUnit, exT=xT?PRICE.secondStudent+(xT-1)*PRICE.perStudent:0, tot=t.base+exS+exT;
   $('#lBase').textContent=`السعر الأساسي (لحد ${t.baseN} ${t.units})`;$('#vBase').textContent=fmt(t.base);
   $('#lSl').textContent=`${t.units} زيادة (${xS} × ${fmt(PRICE.perUnit)})`;$('#vSl').textContent=fmt(exS);
-  $('#lSt').textContent=`طلاب زيادة (${xT} × ${fmt(PRICE.perStudent)})`;$('#vSt').textContent=fmt(exT);
+  $('#lSt').textContent=xT?`طلاب زيادة (${xT}: الثاني ${fmt(PRICE.secondStudent)}${xT>1?` + ${xT-1} × ${fmt(PRICE.perStudent)}`:''})`:'طلاب زيادة (0)';$('#vSt').textContent=fmt(exT);
   $('#vTot').textContent=fmt(tot);$('#okPrice').textContent=fmt(tot);
   if($('#pok').dataset.p&&$('#pok').dataset.p!=tot){$('#pok').checked=false}
   $('#pok').dataset.p=tot; $('#psend').disabled=!$('#pok').checked;
@@ -1255,7 +1368,7 @@ $('#psend').onclick=()=>{
 };
 $('#mClose').onclick=()=>$('#modal').classList.remove('on');
 $('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('on')};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#aConf').classList.contains('on'))return $('#aConf').classList.remove('on');if(editing)return finishEdit();document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on'));if(rd.classList.contains('fs'))exitFs()}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#aConf').classList.contains('on'))return $('#aConf').classList.remove('on');if(editing)return finishEdit();if($('#amodal').classList.contains('on'))closeAuth();$('#modal').classList.remove('on');if(rd.classList.contains('fs'))exitFs()}});
 $('#mCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('#mNote').textContent='انسخت الرسالة.'}catch(e){$('#mNote').textContent='ما گدرت أنسخ، حدد النص وانسخه يدوياً.'}};
 $('#mSend').onclick=()=>{$('#mNote').textContent='إذا ما انفتح الواتساب، انسخ الرسالة ودزها إلنا.'};
 setKind('p');
@@ -1294,7 +1407,9 @@ function qzShow(){
     const sel=`<select class="blank${done?right?' ok':' no':''}" data-qz="pick" aria-label="اختار الجواب"${done?' disabled':''}><option value=""${done?'':' selected'} disabled>اختار ▾</option>${x.o.map((o,j)=>`<option value="${j}"${done&&ans[k]===j?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
     body=`<p class="qq" dir="auto">${esc(pre)}${sel}${esc(post.join(' '))}</p>`;
   }else{
-    body=`<p class="qq" dir="auto">${esc(x.q)}</p><div class="qopts" dir="auto">${x.o.map((o,j)=>`<button type="button" class="qo${done?j===x.a?' ok':j===ans[k]?' no':'':''}" data-qz="pick" data-j="${j}"${done?' disabled':''}><b>${LET[j]}</b><span dir="auto">${esc(o)}</span></button>`).join('')}</div>`;
+    // mcq: أزرار A B C D. tf (صح وغلط): زرين جنب بعض ✓ و ✗
+    const tf=z.kind==='tf';
+    body=`<p class="qq" dir="auto">${esc(x.q)}</p><div class="qopts${tf?' tf':''}" dir="auto">${x.o.map((o,j)=>`<button type="button" class="qo${done?j===x.a?' ok':j===ans[k]?' no':'':''}" data-qz="pick" data-j="${j}"${done?' disabled':''}><b>${tf?(j?'✗':'✓'):LET[j]}</b><span dir="auto">${esc(o)}</span></button>`).join('')}</div>`;
   }
   const fb=!done?'':right?'<p class="qfb ok">✓ صح</p>':`<p class="qfb no">✗ غلط${z.kind==='fill'?` — الصح: <bdi>${esc(x.o[x.a])}</bdi>`:''}</p>`;
   $('#qBody').innerHTML=`<div class="qprog"><span>السؤال <b class="en">${i+1}</b> من <b class="en">${order.length}</b></span><button class="mini" type="button" data-qz="end">إنهاء الاختبار</button></div>
@@ -1335,25 +1450,29 @@ $('#qBody').addEventListener('change',e=>{if(e.target.dataset.qz==='pick'&&e.tar
 document.addEventListener('keydown',e=>{
   if(!QZ||QZ.res||!$('#quiz').classList.contains('on')||e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(e.target.tagName)||$('.modal.on'))return;
   const n=Math.max('123456'.indexOf(e.key),'abcdef'.indexOf(e.key.toLowerCase()));
-  if(n>=0&&QZ.z.kind==='mcq'){e.preventDefault();qzPick(n)}
+  if(n>=0&&QZ.z.kind!=='fill'){e.preventDefault();qzPick(n)}
   else if(e.key==='Enter'){const nx=$('#qBody [data-qz=next]');if(nx){e.preventDefault();nx.click()}}
 });
 /* صيغة الأسئلة بلوحة الأدمن (ونفسها بـ supabase/quizzes/*.txt): كل سؤال بلوك وبينهم سطر فارغ،
-   السؤال (بالإسقاطات بيه ___)، وبعده A) B) C) D)، والصح آخره *، و @ الملزمة. السطر اللي يبدي بـ # ملاحظة */
-const QOPT=/^([A-Fa-f]|[أبجدهو])\s*[).:-]\s*(.+)$/;
+   السؤال (بالإسقاطات بيه ___)، وبعده A) B) C) D)، والصح آخره *، و @ الملزمة. السطر اللي يبدي بـ # ملاحظة.
+   صح وغلط: الجملة، وتحتها سطر بيه "صح" أو "غلط" (أو T / F)، و @ الملزمة */
+const QOPT=/^([A-Fa-f]|[أبجدهو])\s*[).:-]\s*(.+)$/,QTF=/^(صح|غلط|خطأ|خطا|true|false|t|f)$/i,TF_O=['صح','غلط'];
 function qzParse(text,kind){
   const out=[];
   for(const block of text.replace(/\r/g,'').split(/\n\s*\n/)){
     const ls=block.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'));if(!ls.length)continue;
-    const q=[],o=[],a=[];let src='';
+    let q=[],o=[],a=[],src='';
     for(const l of ls){
       const m=l.match(QOPT);
       if(l.startsWith('@'))src=l.slice(1).trim();
-      else if(m&&q.length){let t=m[2].trim();if(t.endsWith('*')){a.push(o.length);t=t.slice(0,-1).trim()}o.push(t)}
+      else if(kind==='tf'&&q.length&&QTF.test(l))a.push(/^(صح|true|t)$/i.test(l)?0:1);
+      else if(kind!=='tf'&&m&&q.length){let t=m[2].trim();if(t.endsWith('*')){a.push(o.length);t=t.slice(0,-1).trim()}o.push(t)}
       else q.push(l);
     }
+    if(kind==='tf')o=TF_O.slice();
     const qq=q.join(' ');
-    const err=!qq?'ماكو نص للسؤال':o.length<2?'لازم اختيارين أو أكثر':o.length>6?'أكثر شي 6 اختيارات':a.length!==1?'لازم اختيار صح واحد، وعليه * بآخره'
+    const err=!qq?'ماكو نص للسؤال':kind==='tf'&&a.length!==1?'لازم سطر واحد تحت الجملة بيه "صح" أو "غلط"'
+      :o.length<2?'لازم اختيارين أو أكثر':o.length>6?'أكثر شي 6 اختيارات':a.length!==1?'لازم اختيار صح واحد، وعليه * بآخره'
       :kind==='fill'&&(qq.match(/_{3,}/g)||[]).length!==1?'لازم فراغ واحد ___ بالسؤال':qq.length>2000||o.some(x=>x.length>500)?'النص طويل هواية':src.length>120?'اسم الملزمة طويل':'';
     if(err)throw new Error(`السؤال ${out.length+1} (${qq.slice(0,40)||'...'}): ${err}`);
     out.push({q:qq,o,a:a[0],src});
@@ -1361,7 +1480,7 @@ function qzParse(text,kind){
   if(!out.length)throw new Error('ماكو أسئلة. الصق الأسئلة بالصيغة اللي فوگ.');
   return out;
 }
-const qzText=qs=>qs.map(x=>[x.q,...x.o.map((o,j)=>`${LET[j]}) ${o}${j===x.a?' *':''}`),...(x.src?[`@ ${x.src}`]:[])].join('\n')).join('\n\n');
+const qzText=(qs,kind)=>qs.map(x=>[x.q,...(kind==='tf'?[TF_O[x.a]||'صح']:x.o.map((o,j)=>`${LET[j]}) ${o}${j===x.a?' *':''}`)),...(x.src?[`@ ${x.src}`]:[])].join('\n')).join('\n\n');
 
 /* ===== لوحة الأدمن (#admin) =====
    الملازم: لكل كورس اسمه وسعره وحالته، ومواده، وبكل مادة ملازمها (رفع PDF، اسم، مجانية/مدفوعة، حذف).
@@ -1397,14 +1516,14 @@ function adMal(){
     <div class="arow"><div class="f"><label>ارفع ملازم <bdi>PDF</bdi> (تكدر تختار أكثر من ملف، تترتب حسب اسم الملف)</label><input type="file" accept="application/pdf,.pdf" multiple data-f="files"></div><label class="chk"><input type="checkbox" data-f="free"${c.price?'':' checked'}>مجانية</label><button class="btn pri" type="button" data-act="up">ارفع</button></div>
     <p class="hint" data-msg style="margin-top:8px">${esc(note(s.id))}</p>
     <div class="aqz"><h4>الاختبارات</h4>
-      <ul class="alec">${quizzesOf(s.id).map(z=>`<li data-zid="${z.id}"><input type="text" value="${esc(z.title)}" aria-label="اسم الاختبار" data-act="ztitle"><span class="hint">${z.kind==='fill'?'إسقاطات':'<bdi>MCQ</bdi>'} · <span class="en">${z.n}</span> سؤال</span><label class="chk"><input type="checkbox" data-act="zfree"${z.free?' checked':''}>مجاني</label><button class="btn sm" type="button" data-act="zedit">تعديل الأسئلة</button><a class="btn sm" href="#quiz/${z.id}">افتح</a><button class="btn sm danger" type="button" data-act="zdel">حذف</button></li>`).join('')||'<li class="hint">ماكو اختبارات بهاي المادة بعد.</li>'}</ul>
+      <ul class="alec">${quizzesOf(s.id).map(z=>`<li data-zid="${z.id}"><input type="text" value="${esc(z.title)}" aria-label="اسم الاختبار" data-act="ztitle"><span class="hint">${z.kind==='fill'?'إسقاطات':z.kind==='tf'?'صح وغلط':'<bdi>MCQ</bdi>'} · <span class="en">${z.n}</span> سؤال</span><label class="chk"><input type="checkbox" data-act="zfree"${z.free?' checked':''}>مجاني</label><button class="btn sm" type="button" data-act="zedit">تعديل الأسئلة</button><a class="btn sm" href="#quiz/${z.id}">افتح</a><button class="btn sm danger" type="button" data-act="zdel">حذف</button></li>`).join('')||'<li class="hint">ماكو اختبارات بهاي المادة بعد.</li>'}</ul>
       <button class="btn sm" type="button" data-act="znew">+ اختبار جديد</button>
       <div data-zform hidden>
         <div class="arow"><div class="f"><label>اسم الاختبار</label><input data-f="ztitle" placeholder="مثلاً: الاختبار الشامل"></div>
-          <div class="f" style="max-width:220px"><label>النوع</label><select data-f="zkind" style="width:100%"><option value="mcq">اختيار من متعدد (MCQ)</option><option value="fill">إسقاطات (املأ الفراغ)</option></select></div>
+          <div class="f" style="max-width:220px"><label>النوع</label><select data-f="zkind" style="width:100%"><option value="mcq">اختيار من متعدد (MCQ)</option><option value="fill">إسقاطات (املأ الفراغ)</option><option value="tf">صح وغلط</option></select></div>
           <label class="chk" style="margin-bottom:10px"><input type="checkbox" data-f="zfree"${c.price?'':' checked'}>مجاني</label></div>
         <div class="f" style="margin-top:10px"><label>الأسئلة</label>
-          <small>كل سؤال بسطور لحاله وبين سؤال وسؤال سطر فارغ. الاختيار الصح عليه <b>*</b> بآخره، و <b>@</b> اسم الملزمة اللي منها السؤال (إذا نفس اسم ملزمة بالمادة، النتيجة تطلع زر يفتحها). بالإسقاطات حط <b>___</b> مكان الفراغ.</small>
+          <small>كل سؤال بسطور لحاله وبين سؤال وسؤال سطر فارغ. الاختيار الصح عليه <b>*</b> بآخره، و <b>@</b> اسم الملزمة اللي منها السؤال (إذا نفس اسم ملزمة بالمادة، النتيجة تطلع زر يفتحها). بالإسقاطات حط <b>___</b> مكان الفراغ. بصح وغلط: الجملة، وتحتها سطر بيه <b>صح</b> أو <b>غلط</b> بس (بدون A B).</small>
           <pre>Which generation introduced SMS?
 A) 1G
 B) 2G *
@@ -1415,7 +1534,11 @@ D) 4G
 1G signals are analog, while 2G signals are ___.
 A) analog
 B) digital *
-...</pre>
+...
+
+The CIA Triad stands for Confidentiality, Integrity, and Availability.
+صح
+@ محاضرة 3</pre>
           <textarea data-f="zq" dir="ltr" spellcheck="false"></textarea></div>
         <div class="arow"><button class="btn pri" type="button" data-act="zsave">احفظ الاختبار</button><button class="btn" type="button" data-act="zcancel">إلغاء</button></div>
         <p class="err" data-zmsg style="margin-top:8px"></p>
@@ -1483,7 +1606,7 @@ $('#adBody').addEventListener('click',async e=>{
     return run(async()=>{
       zmsg('جاري تحميل الأسئلة...');
       const r=await sb.from('quiz_data').select('questions').eq('quiz_id',z.id).maybeSingle();if(r.error)throw r.error;
-      zv('zq').value=qzText(qzClean(r.data?.questions));zmsg('');
+      zv('zq').value=qzText(qzClean(r.data?.questions),z.kind);zmsg('');
     });
   }
   if(act==='zcancel'){zf.hidden=true;return}
@@ -1580,11 +1703,17 @@ route();
   $('#nSub').textContent=DB.subjects.length;
   if(/^#(access_token|error)/.test(location.hash))history.replaceState(null,'',location.pathname+location.search+'#home');
   refreshAll();
-  if(hashErr)openAuth('in',hashErr==='otp_expired'?'رابط التأكيد انتهى أو انستخدم قبل. جرّب سجّل دخول، وإذا ما صار راسلنا.':'ما گدرت أكمل من الرابط، جرّب سجّل دخول.');
+  // دخل برابط تغيير الرمز قبل وما غيّره (حدّث الصفحة أو رابط قديم): نافذة الرمز الجديد ترجع
+  const recov=ME&&(AUTH_LINK?.old==='recovery'||store.get('tp-recov')===ME.user.id);
+  if(AUTH_LINK?.th&&sb)await verifyLink(AUTH_LINK);
+  else if(recov){setRecov(true);openAuth('newpass','اكتب رمز جديد لحسابك (8 أحرف أو أكثر). بدونه ما تكمل.')}
+  else if(ME&&AUTH_LINK?.old==='signup')openAuth('acc',`تأكد إيميلك وصار حسابك جاهز!${ME.profile.stage?'':' اختار مرحلتك حتى نفتحلك ملازمها أول شي.'}`);
+  else if(hashErr)openAuth('in',hashErr==='otp_expired'?'رابط التأكيد انتهى أو انستخدم قبل. جرّب سجّل دخول، وإذا ما صار راسلنا.':'ما گدرت أكمل من الرابط، جرّب سجّل دخول.');
   else if(ME&&!ME.profile.stage)openAuth('acc','اختار مرحلتك حتى نفتحلك ملازمها أول شي.');
   let uid=ME?.user.id;
   sb?.auth.onAuthStateChange((ev,session)=>{
-    if(ev==='PASSWORD_RECOVERY')setTimeout(()=>openAuth('newpass','اكتب الرمز الجديد.'),0);
+    if(ev==='PASSWORD_RECOVERY')setTimeout(()=>{setRecov(true);openAuth('newpass','اكتب رمز جديد لحسابك (8 أحرف أو أكثر). بدونه ما تكمل.')},0);
+    if(ev==='SIGNED_OUT')setRecov(false);
     if((session?.user.id)===uid)return;
     uid=session?.user.id;
     // ما نستدعي Supabase من داخل هذا الـ callback مباشرة (يعلگ)، فنأجلها
