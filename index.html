@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ZLwGK2DAK3kF95Jn/4NAUV1nvqF4Qvo+V/v49l7ALVo=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-86Ky0TDXJSlnrFx0R/6SZldWFhubviHciaUV4D27XhI=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -298,6 +298,56 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .stu .who small{color:var(--mu)}
 .stu select,.arow select{width:auto;padding:6px 8px;font-size:14px}
 
+/* ---------- الاختبارات (#quiz/<id>): سؤال بكل مرة، الجواب يتلون أخضر لو أحمر فوراً، والنتيجة بالآخر. ماكو شي ينحفظ ---------- */
+.mini.qz{border-color:rgba(149,134,194,.6);color:#B9ACE6;background:rgba(149,134,194,.1)}
+.mini.qz:hover{border-color:var(--vi)}
+.mini.qz.lk{color:var(--mu);border-color:var(--bd);background:var(--sf2)}
+#quiz{padding-top:26px}
+#qBody{max-width:820px;margin:0 auto}
+.qprog{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--mu);font-size:15px;margin-bottom:8px}
+.qprog b{color:var(--tx)}
+.qbar{height:4px;background:var(--bd);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.qbar i{display:block;height:100%;background:linear-gradient(90deg,var(--cy),var(--vi));transition:width .3s}
+.qcard{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:22px}
+.qn{font-family:"JetBrains Mono";font-size:13px;color:var(--cy);margin-bottom:8px;direction:ltr;text-align:right}
+.qq{font-family:"Space Grotesk",Tajawal,sans-serif;font-size:19px;font-weight:700;line-height:1.75;margin-bottom:16px}
+.qopts{display:grid;gap:10px}
+.qo{display:flex;align-items:center;gap:12px;text-align:start;padding:12px 14px;border-radius:11px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx);font:inherit;font-family:"Space Grotesk",Tajawal,sans-serif;font-size:16.5px;transition:.15s}
+.qo b{flex:none;display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:var(--sf2);border:1px solid var(--bd);font-family:"JetBrains Mono";font-size:14px}
+.qo:hover:not(:disabled){border-color:var(--cy)}
+.qo:disabled{cursor:default}
+.qo:disabled:not(.ok):not(.no){opacity:.5}
+.qo.ok{border-color:var(--gr);background:rgba(124,199,154,.15)}
+.qo.ok b{background:var(--gr);border-color:var(--gr);color:#0c2416}
+.qo.no{border-color:var(--rd);background:rgba(214,138,138,.15)}
+.qo.no b{background:var(--rd);border-color:var(--rd);color:#2a0f0f}
+/* الفراغ بالإسقاطات: بوكس داخل الجملة بيه الاختيارات (select حتى يشتغل زين بالتلفون) */
+.qq .blank{display:inline-block;width:auto;min-width:8em;max-width:100%;margin:0 6px;padding:2px 10px;font:inherit;color:var(--cy);background:var(--bg2);border:0;border-bottom:2px dashed var(--cy);border-radius:8px 8px 0 0;cursor:pointer}
+.qq .blank option{color:var(--tx);background:var(--sf);font-weight:500}
+.qq .blank:disabled{opacity:1;cursor:default}
+.qq .blank.ok{color:var(--gr);-webkit-text-fill-color:var(--gr);border-bottom:2px solid var(--gr);background:rgba(124,199,154,.15)}
+.qq .blank.no{color:var(--rd);-webkit-text-fill-color:var(--rd);border-bottom:2px solid var(--rd);background:rgba(214,138,138,.15)}
+.qfb{font-weight:800;margin-top:14px}
+.qfb.ok{color:var(--gr)}
+.qfb.no{color:var(--rd)}
+.qfb bdi{color:var(--gr)}
+.qact{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px}
+.qres{text-align:center}
+.qres h3{font-size:20px;margin-bottom:2px}
+.qscore{font-family:"Exo 2";font-style:italic;font-weight:800;font-size:58px;line-height:1.2;color:var(--go);direction:ltr}
+.qsum{color:#B8BDC6;font-size:17px}
+.qsum b{color:var(--rd)}
+.qwrong{list-style:none;display:flex;flex-direction:column;gap:8px;margin:18px 0 6px;text-align:start}
+.qwrong li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;background:var(--bg2);border:1px solid var(--bd);border-inline-start:3px solid var(--rd);border-radius:9px}
+.qwrong .w{display:flex;flex-direction:column;line-height:1.5}
+.qwrong small{color:var(--mu);font-family:"JetBrains Mono";font-size:12.5px;direction:ltr;text-align:right}
+.qres .qact{justify-content:center}
+.aqz{margin-top:16px;padding-top:14px;border-top:1px dashed var(--bd)}
+.aqz h4{font-size:16px;margin-bottom:4px}
+.aqz [data-zform]{margin-top:12px;padding:14px;background:var(--bg2);border:1px solid var(--bd);border-radius:11px}
+.aqz textarea{min-height:240px;font-family:"JetBrains Mono",monospace;font-size:13.5px;line-height:1.55}
+.aqz pre{direction:ltr;text-align:left;font:12.5px/1.55 "JetBrains Mono",monospace;color:var(--mu);background:var(--sf);border:1px solid var(--bd);border-radius:8px;padding:8px 10px;margin:4px 0 10px;white-space:pre-wrap}
+
 /* ---------- contact ---------- */
 .ct{display:grid;grid-template-columns:1.25fr .75fr;gap:26px;align-items:stretch}
 .cid{order:2;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 38%,rgba(107,188,214,.13),transparent 62%),var(--sf);border:1px solid var(--bd);border-radius:18px;padding:34px 22px 26px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center}
@@ -387,6 +437,11 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
   #read{padding-top:14px}
   .rbar{margin-bottom:12px;gap:10px}.rbar h2{font-size:20px}
   .rbar .cta .btn{padding:8px 12px;font-size:14px}
+  .subj li .sa .mini.qz{grid-column:span 2}
+  #quiz{padding-top:14px}
+  .qcard{padding:14px}.qq{font-size:17px;margin-bottom:12px}
+  .qopts{gap:8px}.qo{padding:9px 10px;gap:10px;font-size:15px}.qo b{width:26px;height:26px;font-size:13px}
+  .qscore{font-size:44px}.qsum{font-size:15.5px}
   .ct{gap:12px}
   .cid{flex-direction:row;justify-content:center;gap:12px;padding:14px;text-align:start}
   .cid .art{width:96px;flex:none}.cid .logo{max-width:96px}
@@ -588,6 +643,17 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
   </div>
 </section>
 
+<!-- الاختبار: #quiz/<id الاختبار>. الأجوبة بس بالصفحة، ما تنحفظ -->
+<section class="page" id="quiz">
+  <div class="wrap">
+    <div class="rbar">
+      <div><div class="lab" id="qLab"></div><h2 id="qTitle"></h2></div>
+      <div class="cta" style="margin:0"><a class="btn" href="#malazim">رجوع للملازم</a></div>
+    </div>
+    <div id="qBody" aria-live="polite"></div>
+  </div>
+</section>
+
 <!-- لوحة الأدمن: تبين بس لإيميلات جدول admins (الصلاحيات الحقيقية بـ Supabase، هاي بس الواجهة) -->
 <section class="page" id="admin">
   <div class="wrap">
@@ -701,7 +767,7 @@ const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},s
 /* ===== Supabase: البيانات والحساب =====
    القوائم (كورسات/مواد/ملازم) تنقرا لأي واحد، بس ملف الملزمة ينفتح للطالب المسجل إذا الملزمة مجانية أو الكورس مفعّل إله (الصلاحيات بـ supabase/schema.sql) */
 const sb=window.supabase?supabase.createClient(SB_URL,SB_KEY):null;
-const DB={ok:false,err:'',courses:[],subjects:[],lectures:[]};
+const DB={ok:false,err:'',courses:[],subjects:[],lectures:[],quizzes:[]};
 let ME=null; // {user, profile:{name,stage}, enr:Set(id الكورس), admin}
 const courseById=id=>DB.courses.find(c=>c.id===id);
 const subById=id=>DB.subjects.find(s=>s.id===id);
@@ -710,18 +776,24 @@ const subsOf=cid=>DB.subjects.filter(s=>s.course_id===cid);
 const lecsOf=sid=>DB.lectures.filter(l=>l.subject_id===sid);
 const enrolled=cid=>!!ME&&(ME.admin||ME.enr.has(cid));
 const canRead=l=>!!ME&&(l.free||enrolled(subById(l.subject_id).course_id));
+const quizById=id=>DB.quizzes.find(z=>z.id===id);
+const quizzesOf=sid=>DB.quizzes.filter(z=>z.subject_id===sid);
+const canQuiz=canRead; // نفس شرط الملزمة: مجاني لأي حساب، والباقي للي كورسه مفعّل
 const SITE=location.origin+location.pathname;
 
 async function loadData(){
   if(!sb){DB.err='ما گدرت أتصل بالموقع، تأكد من النت وحدّث الصفحة.';return}
   const order=(q,...k)=>k.reduce((q,c)=>q.order(c),q);
-  const [c,s,l]=await Promise.all([
+  const [c,s,l,z]=await Promise.all([
     order(sb.from('courses').select('*'),'stage','idx'),
     order(sb.from('subjects').select('*'),'sort','id'),
-    order(sb.from('lectures').select('id,subject_id,title,file_path,orig_name,free,sort'),'sort','id')]);
+    order(sb.from('lectures').select('id,subject_id,title,file_path,orig_name,free,sort'),'sort','id'),
+    order(sb.from('quizzes').select('id,subject_id,title,kind,free,n,sort'),'sort','id')]);
   const e=c.error||s.error||l.error;
   if(e){console.warn(e);DB.err='ما گدرت أحمّل الملازم هسه، حدّث الصفحة بعد شوية.';return}
-  Object.assign(DB,{ok:true,err:'',courses:c.data,subjects:s.data,lectures:l.data});
+  // إذا جدول الاختبارات ما موجود بعد (schema.sql ما انعاد) الملازم تبقى شغالة
+  if(z.error)console.warn('quizzes',z.error);
+  Object.assign(DB,{ok:true,err:'',courses:c.data,subjects:s.data,lectures:l.data,quizzes:z.error?[]:z.data});
 }
 async function loadMe(session){
   if(!session){ME=null;return}
@@ -744,7 +816,7 @@ function refreshAll(){
   $('#buyBtn').href=payLink(null);
   renderTabs();renderCourses();
   const on=location.hash.slice(1).split('/')[0];
-  if(on==='read'||on==='admin')route();
+  if(on==='read'||on==='admin'||on==='quiz')route();
 }
 
 /* نافذة الحساب */
@@ -813,11 +885,12 @@ function route(){
   // رابط تأكيد الإيميل يرجع بـ #access_token=... وSupabase يقراه، فنبقى بالرئيسية
   const [id,...args]=/^#(access_token|error)/.test(location.hash)?['home']:location.hash.slice(1).split('/');
   const pages=[...document.querySelectorAll('.page')].map(p=>p.id);
-  const on=pages.includes(id)?id:'home', navOn=on==='read'?'malazim':on;
+  const on=pages.includes(id)?id:'home', navOn=on==='read'||on==='quiz'?'malazim':on;
   document.querySelectorAll('.page').forEach(p=>p.classList.toggle('on',p.id===on));
   document.body.classList.toggle('reading',on==='read'); // بالقارئ ماكو خلفية متحركة
   document.querySelectorAll('nav a').forEach(a=>a.hash==='#'+navOn?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
   if(on==='read')openReader(+args[0]);else{readJob++;annFlush();$('#pdf').innerHTML='';if(fsOn())exitFs()}
+  if(on==='quiz')openQuiz(+args[0]);else{qzJob++;QZ=null}
   if(on==='admin')renderAdmin();
   window.scrollTo({top:0,behavior:'instant'});
 }
@@ -1110,9 +1183,9 @@ function renderTabs(){
 function badge(c){return c.status==='soon'?'<span class="badge b-soon">قريباً</span>':!c.price?'<span class="badge b-free">مجاني</span>':enrolled(c.id)?'<span class="badge b-free">مفعّل</span>':`<span class="badge b-paid"><bdi>${fmt(c.price)}</bdi> د.ع</span>`}
 function subAct(c,x){
   if(c.status==='soon')return '';
-  const ls=lecsOf(x.id);
-  if(!ls.length)return '<span class="c">قريباً</span>';
-  return `<div class="sa">${ls.map(l=>`<a class="mini ${!ME||canRead(l)?'go':'lk'}" href="#read/${l.id}">${esc(l.title)}</a>`).join('')}</div>`;
+  const ls=lecsOf(x.id),zs=quizzesOf(x.id);
+  if(!ls.length&&!zs.length)return '<span class="c">قريباً</span>';
+  return `<div class="sa">${ls.map(l=>`<a class="mini ${!ME||canRead(l)?'go':'lk'}" href="#read/${l.id}">${esc(l.title)}</a>`).join('')}${zs.map(z=>`<a class="mini qz${!ME||canQuiz(z)?'':' lk'}" href="#quiz/${z.id}">${esc(z.title)}</a>`).join('')}</div>`;
 }
 function renderCourses(){
   if(!DB.ok){$('#courses').innerHTML=`<div class="empty" style="grid-column:1/-1">${DB.err||'جاري التحميل...'}</div>`;return}
@@ -1187,6 +1260,109 @@ $('#mCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('#m
 $('#mSend').onclick=()=>{$('#mNote').textContent='إذا ما انفتح الواتساب، انسخ الرسالة ودزها إلنا.'};
 setKind('p');
 
+/* ===== الاختبارات (#quiz/<id>) =====
+   سؤال بكل مرة: mcq = أزرار اختيارات، fill = جملة بيها فراغ (بوكس بيه الاختيارات). الجواب يتلون فوراً: الصح أخضر والغلط أحمر.
+   بالآخر: كم صح، وكم غلط، والغلط من يا ملزمة (src). كل شي بالذاكرة بس، ما ينحفظ بأي مكان. */
+let QZ=null,qzJob=0; // {z, sub, qs, order:[أرقام الأسئلة بهاي الجولة], i, ans:{رقم السؤال: الاختيار}, res}
+const LET='ABCDEF';
+// الأسئلة من قاعدة البيانات تتنظف قبل ما تنعرض: نصوص بس، والجواب الصح رقم ضمن الاختيارات
+function qzClean(d){
+  return (Array.isArray(d)?d:[]).filter(x=>x&&typeof x.q==='string'&&Array.isArray(x.o)).map(x=>({q:x.q.slice(0,2000),o:x.o.slice(0,6).map(o=>String(o).slice(0,500)),a:+x.a,src:typeof x.src==='string'?x.src.slice(0,120):''})).filter(x=>x.o.length>=2&&Number.isInteger(x.a)&&x.a>=0&&x.a<x.o.length);
+}
+async function openQuiz(id){
+  const job=++qzJob,box=$('#qBody'),msg=(t,act)=>{if(job===qzJob)box.innerHTML=`<div class="empty">${t}${act?`<div class="cta" style="justify-content:center;margin-top:14px">${act}</div>`:''}</div>`};
+  QZ=null;
+  if(!DB.ok){$('#qTitle').textContent='';$('#qLab').textContent='';return msg(DB.err||'جاري التحميل...')}
+  const z=quizById(id),sub=z&&subById(z.subject_id),c=sub&&courseById(sub.course_id);
+  $('#qTitle').innerHTML=z?esc(z.title):'';$('#qLab').innerHTML=sub?`<bdi>${esc(sub.name)}</bdi> · ${c?esc(STAGE_NAMES[c.stage-1]):''}`:'';
+  if(!z)return msg('هذا الاختبار مو موجود، يمكن انحذف.','<a class="btn" href="#malazim">رجوع للملازم</a>');
+  if(!ME)return msg('سجّل دخول أو سوّي حساب حتى تحل الاختبار.','<button class="btn pri" type="button" data-login="in">تسجيل دخول</button><button class="btn" type="button" data-login="up">حساب جديد</button>');
+  if(!canQuiz(z))return msg('هذا الاختبار ضمن كورس مدفوع. بعد ما تدفع نفعّل الكورس بحسابك وينفتحلك.',`<a class="btn pri" target="_blank" rel="noopener" href="${payLink(c)}">ادفع على الواتساب</a>`);
+  msg('جاري تحميل الاختبار...');
+  const r=await sb.from('quiz_data').select('questions').eq('quiz_id',id).maybeSingle();
+  if(job!==qzJob)return;
+  if(r.error){console.warn(r.error);return msg('ما گدرت أحمّل الاختبار. حدّث الصفحة، وإذا بقت المشكلة راسلنا.')}
+  const qs=qzClean(r.data?.questions);
+  if(!qs.length)return msg('هذا الاختبار ماكو بيه أسئلة بعد.');
+  QZ={z,sub,qs,order:qs.map((_,k)=>k),i:0,ans:{},res:false};qzShow();
+}
+function qzShow(){
+  const {z,qs,order,i,ans}=QZ,k=order[i],x=qs[k],done=k in ans,right=done&&ans[k]===x.a;
+  let body;
+  if(z.kind==='fill'){
+    const [pre,...post]=x.q.split(/_{3,}/);
+    const sel=`<select class="blank${done?right?' ok':' no':''}" data-qz="pick" aria-label="اختار الجواب"${done?' disabled':''}><option value=""${done?'':' selected'} disabled>اختار ▾</option>${x.o.map((o,j)=>`<option value="${j}"${done&&ans[k]===j?' selected':''}>${esc(o)}</option>`).join('')}</select>`;
+    body=`<p class="qq" dir="auto">${esc(pre)}${sel}${esc(post.join(' '))}</p>`;
+  }else{
+    body=`<p class="qq" dir="auto">${esc(x.q)}</p><div class="qopts" dir="auto">${x.o.map((o,j)=>`<button type="button" class="qo${done?j===x.a?' ok':j===ans[k]?' no':'':''}" data-qz="pick" data-j="${j}"${done?' disabled':''}><b>${LET[j]}</b><span dir="auto">${esc(o)}</span></button>`).join('')}</div>`;
+  }
+  const fb=!done?'':right?'<p class="qfb ok">✓ صح</p>':`<p class="qfb no">✗ غلط${z.kind==='fill'?` — الصح: <bdi>${esc(x.o[x.a])}</bdi>`:''}</p>`;
+  $('#qBody').innerHTML=`<div class="qprog"><span>السؤال <b class="en">${i+1}</b> من <b class="en">${order.length}</b></span><button class="mini" type="button" data-qz="end">إنهاء الاختبار</button></div>
+    <div class="qbar"><i style="width:${(i+(done?1:0))/order.length*100}%"></i></div>
+    <div class="qcard"><div class="qn">Q${k+1}${x.src?` · ${esc(x.src)}`:''}</div>${body}${fb}
+    <div class="qact">${done?`<button class="btn pri" type="button" data-qz="next">${i+1<order.length?'السؤال الجاي':'شوف النتيجة'}</button>`:''}</div></div>`;
+}
+function qzPick(j){
+  const k=QZ.order[QZ.i];if(k in QZ.ans||!(j>=0&&j<QZ.qs[k].o.length))return;
+  QZ.ans[k]=j;qzShow();$('#qBody [data-qz=next]')?.focus({preventScroll:true});
+}
+function qzResult(){
+  QZ.res=true;
+  const {qs,order,ans,sub}=QZ,done=order.filter(k=>k in ans),wrong=done.filter(k=>ans[k]!==qs[k].a),right=done.length-wrong.length,skip=order.length-done.length;
+  // الغلط مجمّع حسب الملزمة، وإذا بالمادة ملزمة بنفس الاسم يطلع زر يفتحها
+  const by=new Map();wrong.forEach(k=>{const s=qs[k].src||'بدون ملزمة';by.has(s)||by.set(s,[]);by.get(s).push(k)});
+  const lecOf=s=>lecsOf(sub.id).find(l=>l.title.trim()===s.trim());
+  const list=[...by].map(([s,ks])=>{const l=lecOf(s);return `<li><span class="w"><b>${esc(s)} — <span class="en">${ks.length}</span> غلط</b><small>${ks.map(k=>'Q'+(k+1)).join(' · ')}</small></span>${l?`<a class="btn sm" href="#read/${l.id}">افتح الملزمة</a>`:''}</li>`}).join('');
+  const sum=!done.length?'ما جاوبت ولا سؤال.':!wrong.length?`ما غلطت ولا سؤال، عاشت إيدك!`:`غلطت بـ <b class="en">${wrong.length}</b> ${wrong.length===1?'سؤال':'أسئلة'}، وهاي الملازم اللي تحتاج ترجعلها:`;
+  $('#qBody').innerHTML=`<div class="qcard qres"><h3>النتيجة</h3><div class="qscore">${right} / ${order.length}</div>
+    <p class="qsum">${sum}</p>${skip&&done.length?`<p class="hint">ما جاوبت على ${skip} من الأسئلة.</p>`:''}${list?`<ul class="qwrong">${list}</ul>`:''}
+    <div class="qact">${wrong.length?'<button class="btn pri" type="button" data-qz="wrong">أعد الأسئلة اللي غلطت بيها</button>':''}${skip?'<button class="btn" type="button" data-qz="cont">كمّل من وين ما وصلت</button>':''}<button class="btn" type="button" data-qz="again">أعد الاختبار كله</button></div></div>`;
+  window.scrollTo({top:0,behavior:'instant'});
+}
+function qzRestart(order){Object.assign(QZ,{order,i:0,ans:{},res:false});qzShow();window.scrollTo({top:0,behavior:'instant'})}
+$('#qBody').addEventListener('click',e=>{
+  const b=e.target.closest('[data-qz]');if(!b||!QZ||b.tagName==='SELECT')return;
+  const a=b.dataset.qz,{qs,order,ans}=QZ;
+  if(a==='pick')return qzPick(+b.dataset.j);
+  if(a==='next'){if(QZ.i+1<order.length){QZ.i++;qzShow();const t=$('#qBody').getBoundingClientRect().top;if(t<0)window.scrollTo({top:scrollY+t-80,behavior:'instant'})}else qzResult();return}
+  if(a==='end')return qzResult();
+  if(a==='wrong')return qzRestart(order.filter(k=>k in ans&&ans[k]!==qs[k].a));
+  if(a==='again')return qzRestart(qs.map((_,k)=>k));
+  if(a==='cont'){QZ.res=false;QZ.i=Math.max(0,order.findIndex(k=>!(k in ans)));qzShow()}
+});
+$('#qBody').addEventListener('change',e=>{if(e.target.dataset.qz==='pick'&&e.target.value!=='')qzPick(+e.target.value)});
+// بالكيبورد: 1-6 أو A-F تختار، و Enter للسؤال الجاي
+document.addEventListener('keydown',e=>{
+  if(!QZ||QZ.res||!$('#quiz').classList.contains('on')||e.ctrlKey||e.metaKey||e.altKey||/^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(e.target.tagName)||$('.modal.on'))return;
+  const n=Math.max('123456'.indexOf(e.key),'abcdef'.indexOf(e.key.toLowerCase()));
+  if(n>=0&&QZ.z.kind==='mcq'){e.preventDefault();qzPick(n)}
+  else if(e.key==='Enter'){const nx=$('#qBody [data-qz=next]');if(nx){e.preventDefault();nx.click()}}
+});
+/* صيغة الأسئلة بلوحة الأدمن (ونفسها بـ supabase/quizzes/*.txt): كل سؤال بلوك وبينهم سطر فارغ،
+   السؤال (بالإسقاطات بيه ___)، وبعده A) B) C) D)، والصح آخره *، و @ الملزمة. السطر اللي يبدي بـ # ملاحظة */
+const QOPT=/^([A-Fa-f]|[أبجدهو])\s*[).:-]\s*(.+)$/;
+function qzParse(text,kind){
+  const out=[];
+  for(const block of text.replace(/\r/g,'').split(/\n\s*\n/)){
+    const ls=block.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'));if(!ls.length)continue;
+    const q=[],o=[],a=[];let src='';
+    for(const l of ls){
+      const m=l.match(QOPT);
+      if(l.startsWith('@'))src=l.slice(1).trim();
+      else if(m&&q.length){let t=m[2].trim();if(t.endsWith('*')){a.push(o.length);t=t.slice(0,-1).trim()}o.push(t)}
+      else q.push(l);
+    }
+    const qq=q.join(' ');
+    const err=!qq?'ماكو نص للسؤال':o.length<2?'لازم اختيارين أو أكثر':o.length>6?'أكثر شي 6 اختيارات':a.length!==1?'لازم اختيار صح واحد، وعليه * بآخره'
+      :kind==='fill'&&(qq.match(/_{3,}/g)||[]).length!==1?'لازم فراغ واحد ___ بالسؤال':qq.length>2000||o.some(x=>x.length>500)?'النص طويل هواية':src.length>120?'اسم الملزمة طويل':'';
+    if(err)throw new Error(`السؤال ${out.length+1} (${qq.slice(0,40)||'...'}): ${err}`);
+    out.push({q:qq,o,a:a[0],src});
+  }
+  if(!out.length)throw new Error('ماكو أسئلة. الصق الأسئلة بالصيغة اللي فوگ.');
+  return out;
+}
+const qzText=qs=>qs.map(x=>[x.q,...x.o.map((o,j)=>`${LET[j]}) ${o}${j===x.a?' *':''}`),...(x.src?[`@ ${x.src}`]:[])].join('\n')).join('\n\n');
+
 /* ===== لوحة الأدمن (#admin) =====
    الملازم: لكل كورس اسمه وسعره وحالته، ومواده، وبكل مادة ملازمها (رفع PDF، اسم، مجانية/مدفوعة، حذف).
    الطلاب: كل الحسابات، وتفعيل الكورسات المدفوعة لكل طالب أو شيلها. الملف ينخزن بـ malazim/<الكورس>/<uuid>.pdf */
@@ -1220,6 +1396,31 @@ function adMal(){
     <ul class="alec">${lecsOf(s.id).map(l=>`<li data-lid="${l.id}"><input type="text" value="${esc(l.title)}" aria-label="اسم الملزمة" data-act="ltitle"><label class="chk"><input type="checkbox" data-act="lfree"${l.free?' checked':''}>مجانية</label><a class="btn sm" href="#read/${l.id}">افتح</a><button class="btn sm danger" type="button" data-act="ldel">حذف</button></li>`).join('')||'<li class="hint">ماكو ملازم بهاي المادة بعد.</li>'}</ul>
     <div class="arow"><div class="f"><label>ارفع ملازم <bdi>PDF</bdi> (تكدر تختار أكثر من ملف، تترتب حسب اسم الملف)</label><input type="file" accept="application/pdf,.pdf" multiple data-f="files"></div><label class="chk"><input type="checkbox" data-f="free"${c.price?'':' checked'}>مجانية</label><button class="btn pri" type="button" data-act="up">ارفع</button></div>
     <p class="hint" data-msg style="margin-top:8px">${esc(note(s.id))}</p>
+    <div class="aqz"><h4>الاختبارات</h4>
+      <ul class="alec">${quizzesOf(s.id).map(z=>`<li data-zid="${z.id}"><input type="text" value="${esc(z.title)}" aria-label="اسم الاختبار" data-act="ztitle"><span class="hint">${z.kind==='fill'?'إسقاطات':'<bdi>MCQ</bdi>'} · <span class="en">${z.n}</span> سؤال</span><label class="chk"><input type="checkbox" data-act="zfree"${z.free?' checked':''}>مجاني</label><button class="btn sm" type="button" data-act="zedit">تعديل الأسئلة</button><a class="btn sm" href="#quiz/${z.id}">افتح</a><button class="btn sm danger" type="button" data-act="zdel">حذف</button></li>`).join('')||'<li class="hint">ماكو اختبارات بهاي المادة بعد.</li>'}</ul>
+      <button class="btn sm" type="button" data-act="znew">+ اختبار جديد</button>
+      <div data-zform hidden>
+        <div class="arow"><div class="f"><label>اسم الاختبار</label><input data-f="ztitle" placeholder="مثلاً: الاختبار الشامل"></div>
+          <div class="f" style="max-width:220px"><label>النوع</label><select data-f="zkind" style="width:100%"><option value="mcq">اختيار من متعدد (MCQ)</option><option value="fill">إسقاطات (املأ الفراغ)</option></select></div>
+          <label class="chk" style="margin-bottom:10px"><input type="checkbox" data-f="zfree"${c.price?'':' checked'}>مجاني</label></div>
+        <div class="f" style="margin-top:10px"><label>الأسئلة</label>
+          <small>كل سؤال بسطور لحاله وبين سؤال وسؤال سطر فارغ. الاختيار الصح عليه <b>*</b> بآخره، و <b>@</b> اسم الملزمة اللي منها السؤال (إذا نفس اسم ملزمة بالمادة، النتيجة تطلع زر يفتحها). بالإسقاطات حط <b>___</b> مكان الفراغ.</small>
+          <pre>Which generation introduced SMS?
+A) 1G
+B) 2G *
+C) 3G
+D) 4G
+@ محاضرة 2
+
+1G signals are analog, while 2G signals are ___.
+A) analog
+B) digital *
+...</pre>
+          <textarea data-f="zq" dir="ltr" spellcheck="false"></textarea></div>
+        <div class="arow"><button class="btn pri" type="button" data-act="zsave">احفظ الاختبار</button><button class="btn" type="button" data-act="zcancel">إلغاء</button></div>
+        <p class="err" data-zmsg style="margin-top:8px"></p>
+      </div>
+    </div>
   </div>`).join('')}
   <div class="abox"><h3>إضافة مادة لهذا الكورس</h3><div class="arow"><div class="f"><label for="adSName">اسم المادة</label><input id="adSName" placeholder="مثلاً: Network Security"></div><div class="f"><label for="adSNote">وصف قصير (اختياري)</label><input id="adSNote" placeholder="مثلاً: 4 محاضرات"></div><button class="btn pri" type="button" data-act="sadd">أضف</button></div><p class="hint" style="margin-top:8px">${esc(note('s'))}</p></div>`;
   adNote=null;
@@ -1251,6 +1452,14 @@ $('#adBody').addEventListener('input',e=>{if(e.target.id==='adQ')adStuList()});
 $('#adBody').addEventListener('change',async e=>{
   const t=e.target,li=t.closest('[data-lid]');
   if(t.id==='adC'){adCourse=t.value;return adMal()}
+  const zli=t.closest('[data-zid]');
+  if(zli){
+    const zp=t.dataset.act==='ztitle'?{title:t.value.trim().slice(0,120)||'اختبار'}:t.dataset.act==='zfree'?{free:t.checked}:null;
+    if(!zp)return;
+    const r=await sb.from('quizzes').update(zp).eq('id',+zli.dataset.zid);
+    if(r.error)alert('ما انحفظ: '+r.error.message);
+    return reload();
+  }
   if(!li)return;
   const patch=t.dataset.act==='ltitle'?{title:t.value.trim()||'محاضرة'}:t.dataset.act==='lfree'?{free:t.checked}:null;
   if(!patch)return;
@@ -1263,6 +1472,40 @@ $('#adBody').addEventListener('click',async e=>{
   const act=b.dataset.act,box=b.closest('[data-sid]'),s=box&&subById(+box.dataset.sid),c=courseById(adCourse);
   const run=async(fn)=>{b.disabled=true;try{await fn()}catch(x){console.warn(x);alert('صار خطأ: '+(x.message||x))}b.disabled=false};
   if(act==='sedit')return box.querySelector('[data-sform]').hidden^=1;
+  // الاختبارات: نفس الفورم للجديد والتعديل (dataset.edit = id الاختبار اللي ينعدل)
+  const zf=box?.querySelector('[data-zform]'),zv=k=>zf.querySelector(`[data-f=${k}]`),zmsg=t=>zf.querySelector('[data-zmsg]').textContent=t;
+  if(act==='znew'||act==='zedit'){
+    const z=act==='zedit'?quizById(+b.closest('[data-zid]').dataset.zid):null;
+    zf.dataset.edit=z?z.id:'';zmsg('');
+    zv('ztitle').value=z?z.title:'';zv('zkind').value=z?z.kind:'mcq';zv('zfree').checked=z?z.free:!c.price;zv('zq').value='';
+    zf.hidden=false;zf.scrollIntoView({block:'nearest'});
+    if(!z)return zv('ztitle').focus();
+    return run(async()=>{
+      zmsg('جاري تحميل الأسئلة...');
+      const r=await sb.from('quiz_data').select('questions').eq('quiz_id',z.id).maybeSingle();if(r.error)throw r.error;
+      zv('zq').value=qzText(qzClean(r.data?.questions));zmsg('');
+    });
+  }
+  if(act==='zcancel'){zf.hidden=true;return}
+  if(act==='zsave'){
+    const title=zv('ztitle').value.trim(),kind=zv('zkind').value,free=zv('zfree').checked;
+    if(!title)return zmsg('اكتب اسم الاختبار.');
+    if(title.length>120)return zmsg('اسم الاختبار طويل، خليه أقل من 120 حرف.');
+    let qs;try{qs=qzParse(zv('zq').value,kind)}catch(x){return zmsg(x.message)}
+    return run(async()=>{
+      let id=+zf.dataset.edit||0;const isNew=!id;
+      if(id){const r=await sb.from('quizzes').update({title,kind,free,n:qs.length}).eq('id',id);if(r.error)throw r.error}
+      else{const r=await sb.from('quizzes').insert({subject_id:s.id,title,kind,free,n:qs.length,sort:quizzesOf(s.id).length+1}).select('id').single();if(r.error)throw r.error;id=r.data.id}
+      const d=await sb.from('quiz_data').upsert({quiz_id:id,questions:qs});
+      if(d.error){if(isNew)await sb.from('quizzes').delete().eq('id',id);throw d.error}
+      adNote={sid:s.id,t:`انحفظ "${title}" (${qs.length} سؤال).`};await reload();
+    });
+  }
+  if(act==='zdel'){
+    const z=quizById(+b.closest('[data-zid]').dataset.zid);
+    if(!confirm(`تحذف اختبار "${z.title}" (${z.n} سؤال) من ${s.name}؟ الأسئلة تنمسح نهائياً.`))return;
+    return run(async()=>{const r=await sb.from('quizzes').delete().eq('id',z.id);if(r.error)throw r.error;await reload()});
+  }
   if(act==='csave')return run(async()=>{
     const r=await sb.from('courses').update({name:$('#adCName').value.trim()||c.name,price:Math.max(0,+$('#adCPrice').value||0),status:$('#adCStatus').value}).eq('id',c.id);if(r.error)throw r.error;
     adNote={sid:'c',t:'انحفظ.'};await reload();
