@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-sImOCduGBT6RDv5uYrM6WUNuBcGJCFKZoW+6PCJi+5I=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-nyQQwS2Cbd0AV7nA3am6N/xgngOEzyUgf9c11tbf20A=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -157,9 +157,61 @@ section{padding:56px 0}
 .card .act{margin-top:auto;display:flex;gap:10px}
 
 /* ---------- presentation ---------- */
-.pp{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:start}
-@media (max-width:900px){.pp{grid-template-columns:1fr}}
-form.box,.quote{background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:24px}
+/* الطلب بخطوات: شريط الخطوات فوگ، وكارت لكل خطوة، وتحت كل كارت رجوع/التالي */
+.wiz{max-width:880px;margin:0 auto}
+.wsteps{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.wsteps li{display:flex;flex-direction:column;gap:7px;font-size:13.5px;font-weight:700;color:var(--mu)}
+.wsteps li::before{content:"";height:4px;border-radius:4px;background:var(--bd);transition:background .2s}
+.wsteps li.done{color:#B8BDC6;cursor:pointer}.wsteps li.done::before{background:var(--vi)}
+.wsteps li.on{color:var(--tx)}.wsteps li.on::before{background:var(--cy)}
+.wcard{background:var(--sf);border:1px solid var(--bd);border-radius:16px;padding:24px;animation:up .25s ease both}
+.wstep{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--cy);margin-bottom:4px}
+.wcard h3{font-size:22px;font-weight:800;line-height:1.4}
+.wcard .sub{color:var(--mu);margin:2px 0 18px}
+.f label small{font-weight:500;color:var(--mu);font-size:13px}
+.kinds{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.kc{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:22px 20px;border-radius:14px;border:1.5px solid var(--bd);background:var(--bg2);color:var(--tx);text-align:start;font:inherit;transition:border-color .15s,transform .15s}
+.kc:hover{border-color:var(--cy);transform:translateY(-2px)}
+.kc[aria-checked=true]{border-color:var(--cy);background:var(--sf2);box-shadow:inset 0 -3px 0 var(--cy)}
+.kc svg{width:36px;height:36px;color:var(--cy);margin-bottom:4px}
+.kc b{font-size:21px}
+.kc small{color:var(--mu);font-size:14.5px}
+.kc em{font-style:normal;color:var(--go);font-weight:800;font-size:14px;margin-top:4px}
+.w3{display:grid;grid-template-columns:1fr 270px;gap:18px;align-items:start}
+.pnote{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;position:sticky;top:88px}
+.pnote .t{font-size:13px;color:var(--mu);font-weight:700}
+.pnote .v{font-family:"Exo 2";font-style:italic;font-weight:800;font-size:32px;color:var(--go);line-height:1.3}
+.pnote .v small{font-size:14px;color:var(--mu);font-style:normal;font-family:Tajawal}
+.pnote ul{list-style:none;display:grid;gap:5px;margin-top:8px;padding-top:8px;border-top:1px dashed var(--bd)}
+.pnote li{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--mu)}
+.pnote li b{font-family:"JetBrains Mono";color:var(--tx);direction:ltr;font-weight:700}
+.wnav{display:flex;justify-content:space-between;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--bd)}
+.wnav .btn{min-width:130px;justify-content:center}
+.rev{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.rvb{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:12px 14px}
+.rvb:nth-child(2){grid-row:span 2}
+.rvb h4{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:15.5px;margin-bottom:8px}
+.rvb h4 button{background:none;border:1px solid var(--bd);border-radius:8px;padding:2px 10px;color:var(--cy);font:inherit;font-size:13.5px;font-weight:700}
+.rvb h4 button:hover{border-color:var(--cy)}
+.rvb dl{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;font-size:14.5px}
+.rvb dt{color:var(--mu)}
+.rvb dd{color:var(--tx);overflow-wrap:anywhere;white-space:pre-line}
+.rvt{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:6px}
+.btn.wa.off{opacity:.45}
+@media (max-width:760px){
+  .w3,.rev{grid-template-columns:1fr}.rvb:nth-child(2){grid-row:auto}
+  .pnote{position:static}
+}
+@media (max-width:640px){
+  .wsteps{gap:5px;margin-bottom:12px}.wsteps li{font-size:11.5px;gap:5px;line-height:1.3}
+  .wcard{padding:16px;border-radius:14px}
+  .wcard h3{font-size:19px}.wcard .sub{margin-bottom:14px;font-size:14.5px}
+  .kinds{gap:10px}.kc{padding:16px 14px}.kc b{font-size:18px}.kc small{font-size:13px}.kc svg{width:30px;height:30px}
+  /* رجوع/التالي يلزقن بأسفل الشاشة حتى ما يحتاج ينزل */
+  .wnav{position:sticky;bottom:8px;z-index:4;margin:16px -6px 0;padding:8px;border:1px solid var(--bd);border-radius:12px;background:rgba(22,25,30,.96);box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  .wnav .btn{min-width:0;flex:1;padding:11px 10px}
+  .wnav .btn.pri,.wnav .btn.wa{flex:2}
+}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media (max-width:560px){.grid2{grid-template-columns:1fr}}
 .f{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
@@ -174,23 +226,12 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .stepper{display:flex;align-items:center;gap:8px}
 .stepper button{width:40px;height:42px;border-radius:9px;border:1px solid var(--bd);background:var(--sf2);color:var(--tx);font-size:20px}
 .stepper input{text-align:center;font-family:"JetBrains Mono";font-weight:700}
-.quote{position:sticky;top:84px}
-.quote h3{font-size:19px;margin-bottom:12px}
 .rows{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
 .rows div{display:flex;justify-content:space-between;color:#B8BDC6;font-size:15px}
 .rows div b{font-family:"JetBrains Mono";color:var(--tx);direction:ltr}
 .total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--bd);padding-top:14px;margin-bottom:6px}
 .total b{font-family:"Exo 2";font-style:italic;font-size:38px;color:var(--go);direction:ltr}
 .cap{font-size:13px;color:var(--mu);min-height:20px}
-.rule{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;font-size:14px;color:var(--mu);margin:14px 0}
-.rule b{color:var(--tx)}
-.pbar{display:none}
-@media (max-width:700px){
-  .pbar{display:flex;align-items:center;justify-content:space-between;gap:10px;position:sticky;bottom:10px;z-index:4;margin-top:6px;padding:8px 8px 8px 14px;background:rgba(22,25,30,.96);border:1px solid var(--bd);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
-  .pbar span{font-size:14px;color:var(--mu)}
-  .pbar b{font-family:"Exo 2";font-style:italic;font-size:22px;color:var(--go);margin:0 4px}
-  .quote{position:static;scroll-margin-top:12px}
-}
 .agree{display:flex;gap:10px;align-items:flex-start;font-size:15px;margin:10px 0 14px}
 .agree input{width:20px;height:20px;margin-top:4px;accent-color:var(--go)}
 .err{color:var(--rd);font-size:14px;min-height:20px;margin-bottom:6px}
@@ -220,9 +261,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 #read.full .wrap{max-width:none;padding:0}
 #read.full .rbar{margin:0}
 #read.full .rbar>:first-child,#read.full .rbar a,#read.full .tabs{display:none}
-#read.full #rFs{position:fixed;top:12px;left:12px;z-index:5;background:rgba(22,25,30,.88)}
-#read.full .pdf{max-width:none;gap:10px}
-#read.full .pdf .pg{width:min(100%,calc(100vh * var(--ar)));align-self:center;border:0;border-radius:0}
+/* بملء الشاشة زر الطلوع ينتقل للشريط تحت (#aExit) حتى ما يغطي الصفحة */
+#read.full #rFs{display:none}
+/* padding-bottom: آخر صفحة تكدر تصعد فوگ الشريط. dvh = الطول الحقيقي الظاهر بالتلفون (vh بسفاري أطول من الشاشة لما يبين شريط المتصفح) */
+#read.full .pdf{max-width:none;gap:10px;padding-bottom:76px}
+#read.full .pdf .pg{width:min(100%,calc(100vh * var(--ar)));width:min(100%,calc(100dvh * var(--ar)));align-self:center;border:0;border-radius:0}
 /* الزوم بالأصابع (بالسكربت): المتصفح ما يكبّر هو (pan بس)، والصفحات نفسها تكبر لعرض --pw، والقارئ يتسكرل بالعرض والطول */
 #read.full{touch-action:pan-x pan-y}
 #read.full .pdf.zoomed{width:max-content;min-width:100%}
@@ -256,7 +299,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .ecur{position:fixed;z-index:6;border:1.5px solid #fff;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.6);pointer-events:none;display:none;transform:translate(-50%,-50%)}
 #read.full[data-tool=erase] .ecur.on{display:block}
 .atools{display:none}
-#read.full .atools{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;position:fixed;bottom:12px;left:12px;right:12px;width:fit-content;margin:0 auto;z-index:5;background:rgba(22,25,30,.94);border:1px solid var(--bd);border-radius:14px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#read.full .atools{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;position:fixed;bottom:12px;bottom:max(12px,env(safe-area-inset-bottom));left:12px;right:12px;width:fit-content;margin:0 auto;z-index:5;background:rgba(22,25,30,.94);border:1px solid var(--bd);border-radius:14px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
 .atools button{display:flex;align-items:center;gap:6px;height:38px;min-width:38px;padding:0 10px;border-radius:9px;border:1px solid transparent;background:none;color:var(--mu);font:inherit;font-size:14px;font-weight:700}
 .atools button svg{width:18px;height:18px;flex:none}
 .atools button:hover{color:var(--tx);background:var(--sf2)}
@@ -273,22 +316,36 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .atools .g-size input{width:110px;padding:0;border:0;background:none;accent-color:var(--cy)}
 .atools .szdot{display:block;flex:none;border-radius:50%;background:var(--tx)}
 .atools .szbox{width:30px;height:30px;display:flex;align-items:center;justify-content:center}
-@media (max-width:640px){.atools button span{display:none}}
-/* التنقل بين السلايدات: سهم فوگ = السابق، سهم جوة = الجاي، وبالنص رقم الصفحة. السكرول الحر يبقى شغال */
+/* الشريط بملء الشاشة: بالبداية صغير، بيه بس الطلوع والتنقل والزوم وزر "تأشير".
+   "تأشير" يفتح أدوات التأشير فوگه (ويختار آخر أداة)، و"تصفح" يسدها ويرجع الشريط صغير */
 .atools .g-nav{display:flex;align-items:center;gap:2px}
 .atools .g-nav button{min-width:42px;color:var(--tx)}
 .atools #aPage{min-width:62px;text-align:center;font-size:13px;font-weight:700;color:var(--tx);direction:ltr}
-.atools .g-tools{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px}
-.atools #aMore{display:none}
-/* بالتلفون: الشريط يبين التنقل بس، وزر القلم يفتح أدوات التأشير فوگه */
-@media (max-width:640px){
-  #read.full .atools{bottom:8px;left:8px;right:8px;padding:4px;gap:2px}
-  .atools #aMore{display:flex}
-  .atools .g-tools{display:none;width:100%;order:-1;padding-bottom:4px;border-bottom:1px solid var(--bd);margin-bottom:2px}
-  .atools.open .g-tools{display:flex}
-  .atools .g-tools>.sep:first-child{display:none}
-  .atools button{height:36px;min-width:36px;padding:0 8px}
-  .atools .g-size input{width:90px}
+.atools .g-nav .sep{align-self:stretch}
+.atools #aMore{color:var(--cy)}
+.atools.open #aMore{display:none}
+.atools .g-tools{display:none;flex-wrap:wrap;justify-content:center;align-items:center;gap:4px;width:100%;order:-1;padding-bottom:4px;border-bottom:1px solid var(--bd);margin-bottom:2px}
+.atools.open .g-tools{display:flex}
+.atools .g-tools>.sep:first-child{display:none}
+/* تلفون أو آيباد أو لابتوب صغير، أو أي شاشة قصيرة (تلفون بالعرض): أيقونات بس، أصغر، والأدوات بسطر واحد يتسكرل بالعرض بدل ما تصير سطرين وثلاثة */
+@media (max-width:1100px),(max-height:520px){
+  #read.full .atools{bottom:6px;bottom:max(6px,env(safe-area-inset-bottom));left:6px;right:6px;padding:3px;gap:2px;border-radius:12px}
+  #read.full .atools.open{width:auto}
+  .atools button span{display:none}
+  .atools button{height:34px;min-width:34px;padding:0 7px}
+  .atools .g-nav button{min-width:36px}
+  .atools #aPage{min-width:50px;font-size:12px}
+  .atools .g-tools{flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;scrollbar-width:none;min-width:0;max-width:100%}
+  .atools .g-tools::-webkit-scrollbar{display:none}
+  .atools .g-tools>*{flex:none}
+  /* الأهم أول: الأدوات والتراجع، بعدها الألوان والحجم، ومسح الكل آخر شي. وبحافة السطر تلاشي يبين إن اكو بعد */
+  .atools .g-tools>.sep{display:none}
+  .atools .g-tools #aUndo{order:1}.atools .g-tools .g-emode,.atools .g-tools .g-color{order:2}.atools .g-tools .g-size{order:3}.atools .g-tools #aClear{order:4}
+  .atools .g-tools{-webkit-mask-image:linear-gradient(to right,transparent 0,#000 26px);mask-image:linear-gradient(to right,transparent 0,#000 26px)}
+  .atools .sw{min-width:24px;height:24px;margin:5px 1px}
+  .atools .g-size label{display:none}
+  .atools .g-size input{width:80px}
+  #read.full .pdf{padding-bottom:56px}
 }
 .aconf{display:none;position:fixed;inset:0;z-index:7;margin:auto;width:min(360px,calc(100vw - 32px));height:fit-content;background:var(--sf);border:1px solid var(--bd);border-radius:14px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.6);text-align:center}
 .aconf.on{display:block}
@@ -419,12 +476,10 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
 @media (max-width:900px){
   section{padding:36px 0}
   .hero{padding:40px 0 36px}
-  .pp{grid-template-columns:1.1fr .9fr;gap:14px}
   .courses{grid-template-columns:1fr 1fr;gap:14px}
   .card{padding:18px}
 }
 @media (max-width:700px){
-  .pp{grid-template-columns:1fr}
   .courses{grid-template-columns:1fr}
 }
 @media (max-width:640px){
@@ -476,17 +531,14 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
   .subj li .sa-l{grid-template-columns:repeat(auto-fill,minmax(68px,1fr))}
   .subj li .sa-q{grid-template-columns:repeat(auto-fill,minmax(136px,1fr))}
   .subj .mini{display:flex;align-items:center;justify-content:center;text-align:center;white-space:normal;overflow-wrap:break-word;line-height:1.3;min-height:40px;padding:5px 6px;font-size:13px}
-  form.box,.quote{padding:14px}
   .grid2{grid-template-columns:1fr 1fr;gap:10px}
   .f{margin-bottom:10px;gap:4px}.f label{font-size:14px}
   input,select,textarea{padding:8px 10px}
   textarea{min-height:60px}
   .stepper{gap:4px}.stepper button{width:34px;height:40px;flex:none}.stepper input{padding:8px 2px;min-width:0}
   .kind button{padding:8px 10px}
-  .quote h3{font-size:17px;margin-bottom:8px}
   .rows{gap:4px;margin-bottom:10px}.rows div{font-size:14px}
   .total{padding-top:10px}.total b{font-size:30px}
-  .rule{font-size:13px;padding:10px 12px;margin:10px 0}
   #read{padding-top:14px}
   .rbar{margin-bottom:12px;gap:10px}.rbar h2{font-size:20px}
   .rbar .cta .btn{padding:8px 12px;font-size:14px}
@@ -571,47 +623,70 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
 
 <section class="page" id="present">
   <div class="wrap">
-    <div class="sh"><div><h2>برزنتيشنات وتقارير</h2><p>اختار برزنتيشن لو تقرير واكتب شنو تريد، والموقع يحسبلك السعر حسب عدد السلايدات أو الصفحات وعدد الطلاب.</p></div></div>
-    <div class="pp">
-      <form class="box" id="pform" novalidate>
-        <div class="f"><label id="kindLbl">شنو تريد؟</label>
-          <div class="kind" role="radiogroup" aria-labelledby="kindLbl"><button type="button" role="radio" aria-checked="true" data-kind="p">برزنتيشن</button><button type="button" role="radio" aria-checked="false" data-kind="r">تقرير</button></div></div>
-        <div class="grid2">
-          <div class="f"><label for="pname" id="pnameLbl">الاسم</label><input id="pname" autocomplete="name" placeholder="اسمك الكامل"></div>
-          <div class="f"><label for="pstage">المرحلة</label><select id="pstage"><option value="">اختار</option><option>الأولى</option><option>الثانية</option><option>الثالثة</option><option>الرابعة</option></select></div>
+    <div class="sh"><div><h2>برزنتيشنات وتقارير</h2><p>أربع خطوات بسيطة، والسعر يبين وانت تختار. الطلب ينرسل على الواتساب.</p></div></div>
+    <!-- طلب البرزنتيشن أو التقرير بخطوات: كل خطوة .pw، والسكربت يبين وحدة بكل مرة -->
+    <div class="wiz" id="wiz">
+      <ol class="wsteps" id="wsteps"><li data-s="1"><span>النوع</span></li><li data-s="2"><span>الطلاب والموضوع</span></li><li data-s="3"><span>التفاصيل</span></li><li data-s="4"><span>المراجعة</span></li></ol>
+
+      <div class="wcard pw" data-s="1">
+        <div class="wstep">الخطوة 1 من 4</div>
+        <h3>شنو تريد؟</h3><p class="sub">اختار وننقلك للخطوة الجاية.</p>
+        <div class="kinds" role="radiogroup" aria-label="نوع الطلب">
+          <button type="button" class="kc" role="radio" aria-checked="false" data-kind="p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M12 16v4M8 20h8M7 12l3-3 2 2 4-4"/></svg><b>برزنتيشن</b><small>سلايدات تعرضها قدام الدكتور</small><em>يبدي من <bdi id="kpP">5,000</bdi> د.ع</em></button>
+          <button type="button" class="kc" role="radio" aria-checked="false" data-kind="r"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 12h7M9 16h7"/></svg><b>تقرير</b><small>صفحات مكتوبة ومرتبة</small><em>يبدي من <bdi id="kpR">2,000</bdi> د.ع</em></button>
         </div>
-        <div class="f"><label for="psubj">المادة</label><input id="psubj" placeholder="مثلاً: Mobile Computing"></div>
-        <div class="f"><label for="ptopic" class="kw">موضوع البرزنتيشن</label><textarea id="ptopic" placeholder="اكتب الموضوع وأي تفاصيل يريدها الدكتور"></textarea></div>
-        <div class="grid2">
-          <div class="f"><label for="pslides" id="pslidesLbl">عدد السلايدات</label>
-            <div class="stepper"><button type="button" data-step="pslides:-1" aria-label="أقل">−</button><input id="pslides" type="number" inputmode="numeric" min="5" max="40" value="5"><button type="button" data-step="pslides:1" aria-label="أكثر">+</button></div><small id="pslidesHint">من 5 إلى 40</small></div>
-          <div class="f"><label for="pstud">عدد الطلاب بالمجموعة</label>
-            <div class="stepper"><button type="button" data-step="pstud:-1" aria-label="أقل">−</button><input id="pstud" type="number" inputmode="numeric" min="1" max="10" value="1"><button type="button" data-step="pstud:1" aria-label="أكثر">+</button></div><small>من 1 إلى 10</small></div>
-        </div>
+      </div>
+
+      <div class="wcard pw" data-s="2" hidden>
+        <div class="wstep">الخطوة 2 من 4</div>
+        <h3>الطلاب والموضوع</h3><p class="sub">منو يقدّم <span class="kw2">البرزنتيشن</span>، وشنو موضوعه.</p>
+        <div class="f"><label for="pstud">كم طالب بالمجموعة؟</label>
+          <div class="stepper"><button type="button" data-step="pstud:-1" aria-label="أقل">−</button><input id="pstud" type="number" inputmode="numeric" min="1" max="10" value="1"><button type="button" data-step="pstud:1" aria-label="أكثر">+</button></div><small>من 1 إلى 10</small></div>
         <div class="grid2" id="pnames"></div>
         <div class="grid2">
-          <div class="f"><label for="plang" class="kw">لغة البرزنتيشن</label><select id="plang"><option>إنگليزي</option><option>عربي</option></select></div>
-          <div class="f"><label for="pdate">موعد التسليم</label><input id="pdate" type="date"></div>
+          <div class="f"><label for="pstage">المرحلة</label><select id="pstage"><option value="">اختار</option><option>الأولى</option><option>الثانية</option><option>الثالثة</option><option>الرابعة</option></select></div>
+          <div class="f"><label for="psubj">المادة <small>(اختياري)</small></label><input id="psubj" placeholder="اسم المادة"></div>
         </div>
-        <div class="f"><label for="pnotes">ملاحظات (اختياري)</label><textarea id="pnotes" placeholder="ألوان معينة، أو أي شي ثاني"></textarea></div>
-        <!-- بالتلفون: شريط يلزق بأسفل الشاشة بيه المجموع، حتى الطالب يشوف السعر وهو يملي، والزر ينزله للتأكيد -->
-        <div class="pbar"><span>المجموع <b class="en" id="vTot2">5,000</b> د.ع</span><button type="button" class="btn pri sm" id="pGo">كمّل للتأكيد</button></div>
-      </form>
+        <div class="f"><label for="ptopic">موضوع <span class="kw2">البرزنتيشن</span></label><textarea id="ptopic" placeholder="اكتب الموضوع وأي تفاصيل يريدها الدكتور"></textarea></div>
+        <div class="err" data-err="2"></div>
+        <div class="wnav"><button type="button" class="btn" data-go="1">رجوع</button><button type="button" class="btn pri" data-go="3">التالي</button></div>
+      </div>
 
-      <aside class="quote" aria-live="polite">
-        <h3>حساب السعر</h3>
-        <div class="rows">
-          <div><span id="lBase">السعر الأساسي</span><b id="vBase">5,000</b></div>
-          <div><span id="lSl">سلايدات زيادة</span><b id="vSl">0</b></div>
-          <div><span id="lSt">طلاب زيادة</span><b id="vSt">0</b></div>
+      <div class="wcard pw" data-s="3" hidden>
+        <div class="wstep">الخطوة 3 من 4</div>
+        <h3>التفاصيل</h3><p class="sub">كم <span class="kw-u">سلايد</span> تريد، وبيا لغة.</p>
+        <div class="w3">
+          <div>
+            <div class="f"><label for="pslides" id="pslidesLbl">عدد السلايدات</label>
+              <div class="stepper"><button type="button" data-step="pslides:-1" aria-label="أقل">−</button><input id="pslides" type="number" inputmode="numeric" min="5" max="40" value="5"><button type="button" data-step="pslides:1" aria-label="أكثر">+</button></div><small id="pslidesHint">من 5 إلى 40</small></div>
+            <div class="f"><label id="plangLbl">اللغة</label>
+              <div class="kind" role="radiogroup" aria-labelledby="plangLbl"><button type="button" role="radio" aria-checked="true" data-lang="إنگليزي">إنگليزي</button><button type="button" role="radio" aria-checked="false" data-lang="عربي">عربي</button></div></div>
+            <div class="f"><label for="pdate">موعد التسليم <small>(اختياري)</small></label><input id="pdate" type="date" style="max-width:260px"></div>
+            <div class="f"><label for="pnotes">ملاحظات <small>(اختياري)</small></label><textarea id="pnotes" placeholder="ألوان معينة، أو أي شي ثاني يريده الدكتور"></textarea></div>
+          </div>
+          <aside class="pnote" aria-live="polite">
+            <div class="t">السعر لحد هسه</div>
+            <div class="v"><span id="pnTot">5,000</span> <small>د.ع</small></div>
+            <ul id="pnRows"></ul>
+          </aside>
         </div>
-        <div class="total"><span>المجموع</span><b id="vTot">5,000</b></div>
-        <div class="cap">دينار عراقي</div>
-        <div class="rule" id="prule"></div>
-        <label class="agree"><input type="checkbox" id="pok"><span>أوافق على السعر <b id="okPrice" class="en">5,000</b> دينار</span></label>
-        <div class="err" id="perr"></div>
-        <button class="btn pri" id="psend" style="width:100%;justify-content:center" disabled>أكد الطلب</button>
-      </aside>
+        <div class="wnav"><button type="button" class="btn" data-go="2">رجوع</button><button type="button" class="btn pri" data-go="4">راجع الطلب</button></div>
+      </div>
+
+      <div class="wcard pw" data-s="4" hidden>
+        <div class="wstep">الخطوة 4 من 4</div>
+        <h3>راجع طلبك</h3><p class="sub">تأكد من كلشي. إذا تريد تغيّر شي اضغط "تعديل".</p>
+        <div class="rev" id="prev"></div>
+        <div class="rvt">
+          <div class="rows" id="pRows"></div>
+          <div class="total"><span>المجموع النهائي</span><b id="vTot">5,000</b></div>
+          <div class="cap">دينار عراقي</div>
+        </div>
+        <label class="agree"><input type="checkbox" id="pok"><span>أوافق على السعر <b id="okPrice" class="en">5,000</b> دينار، وأريد أرسل الطلب</span></label>
+        <div class="err" data-err="4"></div>
+        <div class="wnav wnav4"><button type="button" class="btn" data-go="3">رجوع</button><a class="btn wa" id="psend" href="#" target="_blank" rel="noopener" aria-disabled="true">أرسل الطلب على واتساب</a></div>
+        <p class="note"><a href="#" id="pcopy">نسخ رسالة الطلب</a> <span id="pnote"></span></p>
+      </div>
     </div>
   </div>
 </section>
@@ -666,11 +741,14 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
     <i class="ecur" id="ecur"></i>
     <div class="atools" id="atools" role="toolbar" aria-label="التنقل وأدوات التأشير">
       <div class="g-nav">
+        <button type="button" id="aExit" title="طلوع من ملء الشاشة" aria-label="طلوع من ملء الشاشة"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg></button>
+        <i class="sep"></i>
         <button type="button" id="aPrev" title="السلايد السابق" aria-label="السلايد السابق"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
         <span class="mono" id="aPage" aria-live="polite">1 / 1</span>
         <button type="button" id="aZoom" title="رجّع الحجم الطبيعي" aria-label="رجّع الحجم الطبيعي" hidden>100%</button>
         <button type="button" id="aNext" title="السلايد الجاي" aria-label="السلايد الجاي"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
-        <button type="button" id="aMore" title="أدوات التأشير" aria-label="أدوات التأشير" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg></button>
+        <i class="sep"></i>
+        <button type="button" id="aMore" title="أدوات التأشير" aria-label="أدوات التأشير" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg><span>تأشير</span></button>
       </div>
       <div class="g-tools"><i class="sep"></i>
       <button type="button" data-tool="none" title="تصفح" aria-label="تصفح"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 8-6 2-2 6z"/></svg><span>تصفح</span></button>
@@ -725,15 +803,6 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
 
 <footer><div class="wrap"><span class="en" dir="ltr">© TP ACCADEMY | تي بي أكاديمي</span><span>ملازم هندسة الأمن السيبراني</span></div></footer>
 
-<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
-  <div class="dlg">
-    <h3 id="mTitle">تأكيد الطلب</h3>
-    <div id="mBody"></div>
-    <pre id="mText"></pre>
-    <div class="act"><a class="btn wa" id="mSend" href="#" target="_blank" rel="noopener">أوافق وأرسل على واتساب</a><button class="btn" id="mCopy">نسخ الرسالة</button><button class="btn" id="mClose">رجوع</button></div>
-    <p class="note" id="mNote"></p>
-  </div>
-</div>
 
 <!-- الحساب: نفس النافذة تبدل بين دخول / حساب جديد / نسيت الرمز / رمز جديد / حسابي (data-for = الأوضاع اللي يبين بيها العنصر) -->
 <div class="modal" id="amodal" role="dialog" aria-modal="true" aria-labelledby="aTitle">
@@ -745,6 +814,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
     <div class="f" data-for="up acc"><label for="aName">الاسم</label><input id="aName" autocomplete="name" placeholder="اسمك الكامل"></div>
     <div class="f" data-for="in up forgot"><label for="aEmail">الإيميل</label><input id="aEmail" type="email" dir="ltr" autocomplete="email" placeholder="name@gmail.com"></div>
     <div class="f" data-for="in up newpass"><label for="aPass">الرمز</label><input id="aPass" type="password" dir="ltr" autocomplete="current-password"><small data-for="up newpass">8 أحرف أو أكثر</small></div>
+    <!-- حساب جديد ورمز جديد: الرمز ينكتب مرتين حتى إذا غلط بحرف ما يضيع الحساب. الدخول بس مرة وحدة -->
+    <div class="f" data-for="up newpass"><label for="aPass2">أعد كتابة الرمز</label><input id="aPass2" type="password" dir="ltr" autocomplete="new-password"><small id="aPassMatch" aria-live="polite"></small></div>
     <div class="f" data-for="up acc"><label for="aStage">مرحلتك</label><select id="aStage"><option value="">اختار</option><option value="1">الأولى</option><option value="2">الثانية</option><option value="3">الثالثة</option><option value="4">الرابعة</option></select></div>
     <div class="f" data-for="acc"><label>الكورسات المفعّلة</label><div class="chips" id="aEnr"></div></div>
     <div class="err" id="aErr"></div>
@@ -911,7 +982,7 @@ function openAuth(m,why){
   $('#aWhy').textContent=why||'';$('#aWhy').hidden=!why;
   document.querySelectorAll('#aform [data-for]').forEach(el=>el.hidden=!el.dataset.for.split(' ').includes(amode));
   document.querySelectorAll('[data-am]').forEach(b=>b.setAttribute('aria-checked',b.dataset.am===amode));
-  $('#aErr').textContent='';$('#aOk').hidden=true;$('#aGo').hidden=false;$('#aPass').value='';$('#aResendP').hidden=true;
+  $('#aErr').textContent='';$('#aOk').hidden=true;$('#aGo').hidden=false;$('#aPass').value='';$('#aPass2').value='';$('#aPassMatch').textContent='';$('#aResendP').hidden=true;
   $('#aClose').textContent=amode==='newpass'&&RECOV?'إلغاء وتسجيل خروج':'رجوع';
   $('#aPass').autocomplete=amode==='in'?'current-password':'new-password';
   if(amode==='acc'){
@@ -936,7 +1007,21 @@ $('#aForgot').onclick=e=>{e.preventDefault();openAuth('forgot','اكتب إيم�
 document.addEventListener('click',e=>{const b=e.target.closest('[data-login]');if(b){e.preventDefault();openAuth(b.dataset.login||'in','سجّل دخول أو سوّي حساب حتى تقرا الملازم.')}});
 $('#aOut').onclick=async()=>{await sb.auth.signOut();closeAuth()};
 const AERR={'Invalid login credentials':'الإيميل أو الرمز غلط.','Email not confirmed':'لازم تأكد إيميلك أول: افتح رسالة التأكيد اللي وصلتك واضغط الرابط.','User already registered':'هذا الإيميل عنده حساب، سجّل دخول.'};
-const aErr=e=>AERR[e.message]||(/rate limit/i.test(e.message)?'محاولات هواية، انتظر شوية وجرب مرة ثانية.':/password/i.test(e.message)?'الرمز ضعيف، خليه 8 أحرف أو أكثر وبيه أرقام وحروف.':'صار خطأ: '+e.message);
+// رسائل الخطأ للطالب بالعراقي وبدون تفاصيل تقنية (نوع الخطأ وأسماء الجداول تنكتب بالـ console بس)
+const aErr=e=>{
+  const m=String(e?.message||'');console.warn('auth/profile error:',e);
+  return AERR[m]||(/rate limit|too many/i.test(m)?'محاولات هواية، انتظر شوية وجرب مرة ثانية.'
+    :/different from the old/i.test(m)?'الرمز الجديد لازم يختلف عن القديم.'
+    :/password/i.test(m)?'الرمز ضعيف، خليه 8 أحرف أو أكثر وبيه أرقام وحروف.'
+    :/email address|invalid format/i.test(m)?'اكتب إيميل صحيح.'
+    :/fetch|network|load failed/i.test(m)?'ما گدرنا نتصل، تأكد من النت وجرب مرة ثانية.'
+    :'ما گدرنا نكمل هسه، جرب مرة ثانية بعد شوية. وإذا بقت المشكلة راسلنا.');
+};
+// وهو يكتب الرمز الثاني: يبين إذا مطابق للأول
+['aPass','aPass2'].forEach(id=>$('#'+id).addEventListener('input',()=>{
+  const a=$('#aPass').value,b=$('#aPass2').value,m=$('#aPassMatch');
+  m.textContent=!b?'':a===b?'✓ الرمزين نفس الشي':'الرمزين بعدهم مو نفس الشي';m.style.color=a===b?'var(--gr)':'var(--mu)';
+}));
 $('#aform').onsubmit=async e=>{
   e.preventDefault();if(!sb)return;
   const email=$('#aEmail').value.trim(),pass=$('#aPass').value,name=$('#aName').value.trim(),stage=$('#aStage').value;
@@ -945,6 +1030,7 @@ $('#aform').onsubmit=async e=>{
   if(['in','up','forgot'].includes(amode)&&!/^\S+@\S+\.\S+$/.test(email))return err('اكتب إيميل صحيح.');
   if(amode==='in'&&!pass)return err('اكتب الرمز.');
   if(['up','newpass'].includes(amode)&&pass.length<8)return err('الرمز لازم 8 أحرف أو أكثر.');
+  if(['up','newpass'].includes(amode)&&pass!==$('#aPass2').value){$('#aPass2').focus();return err('الرمزين مو نفس الشي، اكتب الرمز نفسه بالخانتين.')}
   if(['up','acc'].includes(amode)&&!name)return err('اكتب اسمك.');
   if(['up','acc'].includes(amode)&&name.length>80)return err('الاسم طويل، خليه أقل من 80 حرف.');
   if(['up','acc'].includes(amode)&&!stage)return err('اختار مرحلتك.');
@@ -960,7 +1046,7 @@ $('#aform').onsubmit=async e=>{
     else if(amode==='forgot'){const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:SITE});if(r.error)throw r.error;ok('إذا الإيميل عنده حساب، راح توصله رسالة بيها رابط تغيير الرمز. إذا ما لكيتها شوف مجلد Spam (البريد غير الهام).');$('#aGo').hidden=true}
     else if(amode==='newpass'){const r=await sb.auth.updateUser({password:pass});if(r.error)throw r.error;setRecov(false);$('#aClose').textContent='تمام';ok('تغيّر الرمز، وصرت داخل بحسابك.');$('#aGo').hidden=true}
     else if(amode==='acc'){
-      const r=await sb.from('profiles').update({name,stage:+stage}).eq('id',ME.user.id);if(r.error)throw r.error;
+      const r=await sb.rpc('update_my_profile',{p_name:name,p_stage:+stage});if(r.error)throw r.error;
       ME.profile={name,stage:+stage};ok('انحفظ.');refreshAll();
     }
   }catch(x){err(aErr(x));if(amode==='in'&&x.message==='Email not confirmed')$('#aResendP').hidden=false}
@@ -1075,7 +1161,7 @@ function fsLabel(){
   const on=fsOn(),pg=fsPage||curPage();fsPage=null;
   $('#rFs').textContent=on?'طلوع من ملء الشاشة':'ملء الشاشة';
   if(rd.classList.contains('full')===on)return;
-  if(!on){finishEdit();setZoom(1)}
+  if(!on){finishEdit();setZoom(1);setPanel(false)}
   rd.classList.toggle('full',on);
   requestAnimationFrame(()=>{if(pg)pg.scrollIntoView({block:'start',behavior:'instant'});redraw();pageLabel()});
 }
@@ -1298,17 +1384,23 @@ function setSize(v,quiet){
   $('#aDot').style.cssText=`width:${d}px;height:${d}px`;
   if(!quiet&&editing){editing.x.s=v;noteStyle(editing.pg.querySelector('.ed'),editing.x,1000/ANN.ar);annSave()}
 }
+let lastTool='pen';
 function setTool(t){
-  if(t!=='note')finishEdit();tool=t;rd.dataset.tool=t;
-  document.querySelectorAll('[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t));
+  if(t!=='note')finishEdit();tool=t;rd.dataset.tool=t;if(t!=='none')lastTool=t;
+  document.querySelectorAll('.atools [data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t));
   if(t!=='none')setSize(SIZE[t],true);if(t!=='erase')ecur.classList.remove('on');
+}
+// فتح وسد أدوات التأشير: "تأشير" يفتحها ويرجع آخر أداة، و"تصفح" (أو الطلوع من ملء الشاشة) يسدها
+function setPanel(open){
+  $('#atools').classList.toggle('open',open);$('#aMore').setAttribute('aria-expanded',open);
+  if(open&&tool==='none')setTool(lastTool);if(!open&&tool!=='none')setTool('none');
 }
 function setColor(c,quiet){
   color=c;document.querySelectorAll('[data-color]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.color===c));
   if(!quiet&&editing){editing.x.c=c;editing.pg.querySelector('.ed').style.color=c;annSave()}
 }
 function setEmode(m){emode=m;document.querySelectorAll('[data-emode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.emode===m))}
-document.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+document.querySelectorAll('.atools [data-tool]').forEach(b=>b.onclick=()=>b.dataset.tool==='none'?setPanel(false):setTool(b.dataset.tool));
 document.querySelectorAll('[data-color]').forEach(b=>b.onclick=()=>setColor(b.dataset.color));
 document.querySelectorAll('[data-emode]').forEach(b=>b.onclick=()=>setEmode(b.dataset.emode));
 $('#aSize').oninput=e=>setSize(e.target.value);
@@ -1330,7 +1422,8 @@ function goPage(d){
   if(t)t.scrollIntoView({block:'start',behavior:'smooth'});
 }
 $('#aPrev').onclick=()=>goPage(-1);$('#aNext').onclick=()=>goPage(1);
-$('#aMore').onclick=()=>{const o=$('#atools').classList.toggle('open');$('#aMore').setAttribute('aria-expanded',o);if(!o)setTool('none')};
+$('#aMore').onclick=()=>setPanel(true);
+$('#aExit').onclick=()=>exitFs();
 let pageTick=0;
 function pageLabel(){if(pageTick)return;pageTick=requestAnimationFrame(()=>{pageTick=0;const c=curPage(),n=document.querySelectorAll('#pdf .pg').length;$('#aPage').textContent=c?`${c.dataset.n} / ${n}`:`– / ${n}`})}
 rd.addEventListener('scroll',pageLabel,{passive:true});addEventListener('scroll',pageLabel,{passive:true});
@@ -1372,67 +1465,108 @@ $('#waGen').href=waLink('مرحبا TP Accademy');
 $('#buyBtn').href=payLink(null);
 {const l=$('.hero .logo').cloneNode(true);l.querySelector('filter').id='fxBlur2';l.querySelector('.spark').setAttribute('filter','url(#fxBlur2)');$('#cLogo').append(l)}
 
-/* presentation calculator */
+/* ===== برزنتيشنات وتقارير (#present): 4 خطوات =====
+   1 النوع (يختار وينقل وحده) ← 2 الطلاب والموضوع ← 3 التفاصيل (وبصفها السعر) ← 4 المراجعة: كلشي مكتوب ويا "تعديل" لكل قسم،
+   والسعر النهائي، والموافقة، والإرسال على الواتساب. كل شي بالصفحة بس، ما ينحفظ */
 function clampInput(id){const el=$('#'+id);let v=parseInt(el.value,10);if(isNaN(v))v=+el.min;v=Math.max(+el.min,Math.min(+el.max,v));el.value=v;return v}
-let kind='p';const K=()=>PRICE[kind];
+const P={kind:null,lang:'إنگليزي'};let pStep=1,msg='';
+const PK=()=>PRICE[P.kind||'p'];
+function price(){
+  const t=PK(),n=clampInput('pslides'),st=clampInput('pstud'),xS=Math.max(0,n-t.baseN),xT=Math.max(0,st-1);
+  const exS=xS*PRICE.perUnit,exT=xT?PRICE.secondStudent+(xT-1)*PRICE.perStudent:0;
+  return {t,n,st,xS,xT,exS,exT,tot:t.base+exS+exT};
+}
+// سطور السعر (نفسها بالسعر الجانبي وبالمراجعة)
+function priceRows(p){
+  return [[`الأساسي (لحد ${p.t.baseN} ${p.t.units})`,p.t.base],[`${p.t.units} زيادة (${p.xS} × ${fmt(PRICE.perUnit)})`,p.exS],
+    [p.xT?`طلاب زيادة (${p.xT}: الثاني ${fmt(PRICE.secondStudent)}${p.xT>1?` + ${p.xT-1} × ${fmt(PRICE.perStudent)}`:''})`:'طلاب زيادة (0)',p.exT]];
+}
+function pPrice(){
+  const p=price();
+  $('#pnTot').textContent=fmt(p.tot);
+  $('#pnRows').innerHTML=priceRows(p).map(([l,v])=>`<li><span>${l}</span><b>${fmt(v)}</b></li>`).join('');
+  return p;
+}
 function setKind(k){
-  kind=k;const t=K();
+  P.kind=k;const t=PK(),nm=k==='p'?'البرزنتيشن':'التقرير';
   document.querySelectorAll('[data-kind]').forEach(b=>b.setAttribute('aria-checked',b.dataset.kind===k));
-  document.querySelectorAll('#pform .kw').forEach(l=>l.textContent=l.textContent.replace(/البرزنتيشن|التقرير/,'ال'+(k==='p'?'برزنتيشن':'تقرير')));
+  document.querySelectorAll('.kw2').forEach(s=>s.textContent=nm);
+  document.querySelectorAll('.kw-u').forEach(s=>s.textContent=t.unit);
   $('#pslidesLbl').textContent=`عدد ال${t.units}`;$('#pslides').min=t.baseN;$('#pslides').max=PRICE.maxN;$('#pslidesHint').textContent=`من ${t.baseN} إلى ${PRICE.maxN}`;
-  // الأرقام بـ <bdi> حتى ما تنقلب ويا الواو بالعربي (مثل "و250")
-  const n=v=>`<bdi>${fmt(v)}</bdi>`;
-  $('#prule').innerHTML=`<b>شلون ينحسب؟</b> ${n(t.base)} أساسي لأول ${n(t.baseN)} ${t.units}. كل ${t.unit} زيادة بـ ${n(PRICE.perUnit)}. الطالب الثاني يضيف ${n(PRICE.secondStudent)}، والثالث وكل طالب بعده ${n(PRICE.perStudent)}.`;
-  // عدد السلايدات/الصفحات يبدي من الأساسي، وإذا بعده على أساسي النوع الثاني ينقلب لأساسي هذا النوع
-  const sl=$('#pslides');if(+sl.value===PRICE[k==='p'?'r':'p'].baseN||!sl.value)sl.value=t.baseN;
-  calc();
+  // العدد يبدي من الأساسي، وإذا بعده على أساسي النوع الثاني ينقلب لأساسي هذا النوع
+  const sl=$('#pslides');if(+sl.value===PRICE[k==='p'?'r':'p'].baseN||+sl.value<t.baseN)sl.value=t.baseN;
+  pPrice();
 }
-/* خانات أسماء الطلاب: وحدة لكل طالب بعد الأول، والمكتوب يبقى إذا تغير العدد */
-const names=[];
-function renderNames(st){
-  document.querySelectorAll('#pnames input').forEach((el,i)=>names[i]=el.value);
-  $('#pnameLbl').textContent=st>1?'اسم الطالب 1':'الاسم';
-  $('#pnames').innerHTML=Array.from({length:st-1},(_,i)=>`<div class="f"><label for="pn${i+2}">اسم الطالب ${i+2}</label><input id="pn${i+2}" placeholder="الاسم الكامل"></div>`).join('');
-  document.querySelectorAll('#pnames input').forEach((el,i)=>el.value=names[i]||'');
+function setLang(l){P.lang=l;document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-checked',b.dataset.lang===l))}
+/* خانات الأسماء: وحدة لكل طالب، والمكتوب يبقى إذا تغير العدد */
+const pNames=[];
+function renderNames(){
+  const st=clampInput('pstud');
+  document.querySelectorAll('#pnames input').forEach((el,i)=>pNames[i]=el.value);
+  $('#pnames').innerHTML=Array.from({length:st},(_,i)=>`<div class="f"><label for="pn${i}">${i?`اسم الطالب ${i+1}`:st>1?'اسمك (الطالب 1)':'اسمك'}</label><input id="pn${i}" autocomplete="${i?'off':'name'}" placeholder="الاسم الكامل"></div>`).join('');
+  document.querySelectorAll('#pnames input').forEach((el,i)=>el.value=pNames[i]||'');
+  pPrice();
 }
-function calc(){
-  const t=K(),sl=clampInput('pslides'),st=clampInput('pstud');
-  if($('#pnames').children.length!==st-1)renderNames(st);
-  const xS=Math.max(0,sl-t.baseN),xT=Math.max(0,st-1);
-  const exS=xS*PRICE.perUnit, exT=xT?PRICE.secondStudent+(xT-1)*PRICE.perStudent:0, tot=t.base+exS+exT;
-  $('#lBase').textContent=`السعر الأساسي (لحد ${t.baseN} ${t.units})`;$('#vBase').textContent=fmt(t.base);
-  $('#lSl').textContent=`${t.units} زيادة (${xS} × ${fmt(PRICE.perUnit)})`;$('#vSl').textContent=fmt(exS);
-  $('#lSt').textContent=xT?`طلاب زيادة (${xT}: الثاني ${fmt(PRICE.secondStudent)}${xT>1?` + ${xT-1} × ${fmt(PRICE.perStudent)}`:''})`:'طلاب زيادة (0)';$('#vSt').textContent=fmt(exT);
-  $('#vTot').textContent=fmt(tot);$('#vTot2').textContent=fmt(tot);$('#okPrice').textContent=fmt(tot);
-  if($('#pok').dataset.p&&$('#pok').dataset.p!=tot){$('#pok').checked=false}
-  $('#pok').dataset.p=tot; $('#psend').disabled=!$('#pok').checked;
-  return {sl,st,tot};
+const pNamesNow=()=>[...document.querySelectorAll('#pnames input')].map(el=>el.value.trim());
+// قبل ما ينتقل لقدّام: الخطوة لازم تكون كاملة، وإذا لا يطلع السبب ويروح للخانة الناقصة
+function pCheck(s){
+  const e=document.querySelector(`[data-err="${s}"]`);if(e)e.textContent='';
+  const bad=(t,el)=>{if(e)e.textContent=t;el?.focus();return false};
+  if(s>=2&&!P.kind){pShow(1);return false}
+  if(s===2){
+    const ins=[...document.querySelectorAll('#pnames input')],miss=ins.find(i=>!i.value.trim());
+    if(miss)return bad(ins.length>1?'اكتب أسماء كل الطلاب.':'اكتب اسمك.',miss);
+    if(!$('#pstage').value)return bad('اختار المرحلة.',$('#pstage'));
+    if(!$('#ptopic').value.trim())return bad(`اكتب موضوع ${P.kind==='p'?'البرزنتيشن':'التقرير'}.`,$('#ptopic'));
+  }
+  return true;
 }
-document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>setKind(b.dataset.kind));
-document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const [id,d]=b.dataset.step.split(':');const el=$('#'+id);el.value=(parseInt(el.value,10)||0)+(+d);calc()});
-['pslides','pstud'].forEach(id=>$('#'+id).addEventListener('change',calc));
-['pslides','pstud'].forEach(id=>$('#'+id).addEventListener('input',()=>{if($('#'+id).value!=='')calc()}));
-$('#pok').onchange=()=>{$('#psend').disabled=!$('#pok').checked};
-$('#pGo').onclick=()=>$('.quote').scrollIntoView({block:'start',behavior:'smooth'});
-let msg='';
-$('#psend').onclick=()=>{
-  const {sl,st,tot}=calc(),t=K();const name=$('#pname').value.trim(),topic=$('#ptopic').value.trim(),stage=$('#pstage').value,subj=$('#psubj').value.trim();
-  const others=[...document.querySelectorAll('#pnames input')].map(el=>el.value.trim());
-  if(!name||!topic||!stage){$('#perr').textContent=`اكتب اسمك والمرحلة وموضوع ال${t.name}.`;return}
-  if(others.some(n=>!n)){$('#perr').textContent='اكتب أسماء كل الطلاب.';return}
-  $('#perr').textContent='';
-  const who=st>1?`أسماء الطلاب:\n${[name,...others].map((n,i)=>`${i+1}. ${n}`).join('\n')}`:`الاسم: ${name}`;
-  msg=`طلب ${t.name} - TP Accademy\nالنوع: ${t.name}\n${who}\nالمرحلة: ${stage}\nالمادة: ${subj||'-'}\nالموضوع: ${topic}\nعدد ال${t.units}: ${sl}\nعدد الطلاب: ${st}\nاللغة: ${$('#plang').value}\nموعد التسليم: ${$('#pdate').value||'-'}\nملاحظات: ${$('#pnotes').value.trim()||'-'}\nالسعر: ${fmt(tot)} د.ع (موافق عليه)`;
-  $('#mBody').innerHTML=`<p>السعر النهائي <b class="en" style="color:var(--go);font-size:22px">${fmt(tot)}</b> دينار. إذا موافق، الطلب ينرسل على الواتساب بهاي الرسالة:</p>`;
-  $('#mText').textContent=msg;$('#mSend').href=waLink(msg);$('#mNote').textContent='';
-  $('#modal').classList.add('on');$('#mSend').focus();
+function pShow(s){
+  pStep=s;
+  document.querySelectorAll('.pw').forEach(w=>w.hidden=+w.dataset.s!==s);
+  document.querySelectorAll('#wsteps li').forEach(li=>{const n=+li.dataset.s;li.classList.toggle('on',n===s);li.classList.toggle('done',n<s);li.setAttribute('aria-current',n===s?'step':'false')});
+  if(s===3)pPrice();
+  if(s===4)pReview();
+  if($('#present').classList.contains('on')){const top=$('#wiz').getBoundingClientRect().top+scrollY-90;if(scrollY>top)window.scrollTo({top,behavior:'instant'})}
+}
+function pGo(s){
+  if(s>pStep){for(let k=pStep;k<s;k++)if(!pCheck(k))return}
+  pShow(s);
+}
+// المراجعة: كل اللي اختاره مكتوب (النص من الطالب يمر بـ esc)، ويا زر تعديل يرجعه للخطوة
+function pReview(){
+  const p=price(),t=p.t,nm=P.kind==='p'?'برزنتيشن':'تقرير',names=pNamesNow(),v=id=>$('#'+id).value.trim();
+  const row=(k,val)=>`<dt>${k}</dt><dd>${val?esc(val):'<span class="hint">—</span>'}</dd>`;
+  const box=(title,go,body)=>`<div class="rvb"><h4><span>${title}</span><button type="button" data-go="${go}">تعديل</button></h4><dl>${body}</dl></div>`;
+  $('#prev').innerHTML=box('النوع',1,row('الطلب',nm))
+    +box('الطلاب والموضوع',2,row(names.length>1?`الطلاب (${names.length})`:'الاسم',names.join('، '))+row('المرحلة',v('pstage'))+row('المادة',v('psubj'))+row('الموضوع',v('ptopic')))
+    +box('التفاصيل',3,row(`عدد ال${t.units}`,String(p.n))+row('اللغة',P.lang)+row('موعد التسليم',v('pdate'))+row('ملاحظات',v('pnotes')));
+  $('#pRows').innerHTML=priceRows(p).map(([l,val])=>`<div><span>${l}</span><b>${fmt(val)}</b></div>`).join('');
+  $('#vTot').textContent=fmt(p.tot);$('#okPrice').textContent=fmt(p.tot);
+  // أي تغيير بالسعر يلغي الموافقة السابقة
+  if($('#pok').dataset.p!=p.tot)$('#pok').checked=false;
+  $('#pok').dataset.p=p.tot;
+  const who=names.length>1?`أسماء الطلاب:\n${names.map((n,i)=>`${i+1}. ${n}`).join('\n')}`:`الاسم: ${names[0]}`;
+  msg=`طلب ${nm} - TP Accademy\nالنوع: ${nm}\n${who}\nالمرحلة: ${v('pstage')}\nالمادة: ${v('psubj')||'-'}\nالموضوع: ${v('ptopic')}\nعدد ال${t.units}: ${p.n}\nعدد الطلاب: ${names.length}\nاللغة: ${P.lang}\nموعد التسليم: ${v('pdate')||'-'}\nملاحظات: ${v('pnotes')||'-'}\nالسعر: ${fmt(p.tot)} د.ع (موافق عليه)`;
+  $('#psend').href=waLink(msg);$('#pnote').textContent='';pAgree();
+}
+function pAgree(){const ok=$('#pok').checked;$('#psend').setAttribute('aria-disabled',!ok);$('#psend').classList.toggle('off',!ok);if(ok)document.querySelector('[data-err="4"]').textContent=''}
+document.querySelectorAll('[data-kind]').forEach(b=>b.onclick=()=>{setKind(b.dataset.kind);pShow(2);setTimeout(()=>$('#pn0')?.focus({preventScroll:true}),50)});
+document.querySelectorAll('[data-lang]').forEach(b=>b.onclick=()=>setLang(b.dataset.lang));
+$('#wiz').addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(g)pGo(+g.dataset.go)});
+$('#wsteps').addEventListener('click',e=>{const li=e.target.closest('li.done');if(li)pShow(+li.dataset.s)});
+document.querySelectorAll('[data-step]').forEach(b=>b.onclick=()=>{const [id,d]=b.dataset.step.split(':');const el=$('#'+id);el.value=(parseInt(el.value,10)||0)+(+d);id==='pstud'?renderNames():pPrice()});
+$('#pstud').addEventListener('change',renderNames);$('#pslides').addEventListener('change',pPrice);
+['pstud','pslides'].forEach(id=>$('#'+id).addEventListener('input',()=>{if($('#'+id).value!=='')id==='pstud'?renderNames():pPrice()}));
+$('#pok').onchange=pAgree;
+$('#psend').onclick=e=>{
+  if(!$('#pok').checked){e.preventDefault();document.querySelector('[data-err="4"]').textContent='لازم توافق على السعر أول.';return}
+  $('#pnote').textContent='إذا ما انفتح الواتساب، انسخ الرسالة ودزها إلنا.';
 };
-$('#mClose').onclick=()=>$('#modal').classList.remove('on');
-$('#modal').onclick=e=>{if(e.target.id==='modal')$('#modal').classList.remove('on')};
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#aConf').classList.contains('on'))return $('#aConf').classList.remove('on');if(editing)return finishEdit();if($('#amodal').classList.contains('on'))closeAuth();$('#modal').classList.remove('on');if(rd.classList.contains('fs'))exitFs()}});
-$('#mCopy').onclick=async()=>{try{await navigator.clipboard.writeText(msg);$('#mNote').textContent='انسخت الرسالة.'}catch(e){$('#mNote').textContent='ما گدرت أنسخ، حدد النص وانسخه يدوياً.'}};
-$('#mSend').onclick=()=>{$('#mNote').textContent='إذا ما انفتح الواتساب، انسخ الرسالة ودزها إلنا.'};
-setKind('p');
+$('#pcopy').onclick=async e=>{e.preventDefault();try{await navigator.clipboard.writeText(msg);$('#pnote').textContent='انسخت الرسالة.'}catch(x){$('#pnote').textContent='ما گدرت أنسخ، جرّب مرة ثانية.'}};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('#aConf').classList.contains('on'))return $('#aConf').classList.remove('on');if(editing)return finishEdit();if($('#amodal').classList.contains('on'))closeAuth();if(rd.classList.contains('fs'))exitFs()}});
+$('#kpP').textContent=fmt(PRICE.p.base);$('#kpR').textContent=fmt(PRICE.r.base);
+setLang('إنگليزي');renderNames();pShow(1);
 
 /* ===== الاختبارات (#quiz/<id>) =====
    سؤال بكل مرة: mcq = أزرار اختيارات، fill = جملة بيها فراغ (بوكس بيه الاختيارات). الجواب يتلون فوراً: الصح أخضر والغلط أحمر.
