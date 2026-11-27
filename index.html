@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-DiuL3r9V5VLBpATdwhGvEkPeaZtcrMVA3c9/pUQYv2o=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-pC9L5e+wNMKQBI8/MB0sJIACoxddQSD6zuX5wbX1+8Q=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -289,7 +289,9 @@ input:focus,select:focus,textarea:focus{border-color:var(--cy);outline:none}
 .atools #aZoom{font:700 13px "JetBrains Mono",monospace;color:var(--cy);direction:ltr}
 .pdf canvas{display:block;width:100%;height:100%}
 /* تنبيه "ملء الشاشة لجودة أفضل": يطلع من جوة لما الطالب يسوي زوم بالتلفون برة ملء الشاشة. position:fixed يبقى مثبت حتى ويا زوم المتصفح */
-.zhint{position:fixed;left:0;top:0;transform-origin:0 0;z-index:70;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;background:rgba(22,25,30,.97);border:1px solid var(--cy);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.55);font-weight:700;font-size:15px;white-space:nowrap;color:var(--tx)}
+/* زوم المتصفح ممنوع على صفحات الملزمة برة ملء الشاشة (يشوّش الصورة)، والصبعين يطلعن التنبيه بداله */
+#read:not(.full) .pdf{touch-action:pan-x pan-y}
+.zhint{position:fixed;left:50%;bottom:20px;bottom:calc(env(safe-area-inset-bottom) + 20px);transform:translateX(-50%);z-index:70;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 14px;background:rgba(22,25,30,.97);border:1px solid var(--cy);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.55);font-weight:700;font-size:15px;white-space:nowrap;color:var(--tx)}
 .zhint[hidden]{display:none}
 .zhint .zx{background:none;border:0;color:var(--mu);font-size:22px;line-height:1;padding:0 4px}
 /* الوضع الفاتح للملازم بس (الموقع يبقى غامق): الملازم مصممة غامقة، فنقلب إضاءة ألوانها ونرجّع درجة اللون نفسها (invert + hue-rotate)،
@@ -1605,20 +1607,26 @@ $('#aExit').onclick=()=>exitFs();
    وأول ما يكبّر بالقارئ برة ملء الشاشة يطلع تنبيه "ملء الشاشة لجودة أفضل". يطلع مرة وحدة لكل ملزمة إذا سده */
 (function(){
   const vv=window.visualViewport,h=$('#zHint');if(!vv)return;
-  // أول ما يسوي زوم يطلع التنبيه، ويبقى دائماً بأسفل الشاشة بالنص حتى وهو يسكرل أو يكبّر أو يصغّر، ويختفي بس بالـ ×
-  // (أو إذا فعّل ملء الشاشة أو طلع من الملزمة). مكانه ينحسب كل فريم من الجزء الظاهر من الشاشة، فيبقى بوجهه
+  // ينتقل لـ body: داخل قسم القارئ (بيه انميشن transform) الـ position:fixed يصير نسبةً للقسم مو للشاشة فيتحرك ويا السكرول
+  document.body.appendChild(h);
+  // الطالب يحط صبعين على الملزمة (يريد يكبّر): زوم المتصفح ممنوع هناك (touch-action بالـ CSS، و gesturestart لسفاري)،
+  // وبداله يطلع التنبيه ثابت بأسفل الشاشة فوگ أزرار التلفون، بنفس الحجم والمكان دائماً حتى وهو يسكرل. يختفي بس بالـ ×
+  // (لهاي الملزمة) أو بتفعيل ملء الشاشة أو الطلوع من الملزمة.
+  // إذا رغم هذا صار زوم (بدا من برة الملزمة)، التنبيه يلحق الجزء الظاهر كل فريم حتى يبقى بوجهه
   let shut=null,shown=false,raf=0;
   const hide=()=>{shown=false;h.hidden=true;cancelAnimationFrame(raf)};
   const frame=()=>{
     if(!shown)return;
     if(!$('#read').classList.contains('on')||fsOn())return hide();
-    h.style.transform=`translate3d(${vv.offsetLeft+vv.width/2}px,${vv.offsetTop+vv.height-16/vv.scale}px,0) scale(${1/vv.scale}) translate(-50%,-100%)`;
+    h.style.transform=vv.scale>1.01?`translate3d(${vv.offsetLeft+vv.width/2-innerWidth/2}px,${vv.offsetTop+vv.height-innerHeight}px,0) translateX(-50%) scale(${1/vv.scale})`:'';
+    h.style.transformOrigin='50% 100%';
     raf=requestAnimationFrame(frame);
   };
-  vv.addEventListener('resize',()=>{
-    if(shown||vv.scale<=1.15||!$('#read').classList.contains('on')||fsOn()||shut===location.hash)return;
-    shown=true;h.hidden=false;frame();
-  });
+  const show=()=>{if(shown||!$('#read').classList.contains('on')||fsOn()||shut===location.hash)return;shown=true;h.hidden=false;frame()};
+  const pdf=$('#pdf');
+  pdf.addEventListener('touchstart',e=>{if(e.touches.length>1&&!fsOn())show()},{passive:true});
+  ['gesturestart','gesturechange'].forEach(ev=>pdf.addEventListener(ev,e=>{if(!fsOn()){e.preventDefault();show()}}));
+  vv.addEventListener('resize',()=>{if(vv.scale>1.15)show()});
   addEventListener('hashchange',hide);
   $('#zHintX').onclick=()=>{shut=location.hash;hide()};
   $('#zHintGo').onclick=()=>{hide();$('#rFs').click()};
