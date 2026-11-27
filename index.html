@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-zRzqIDZUaqmoC6E9ZNi8EVDNNbNp8/ALpRuayW8DPqc=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-DiuL3r9V5VLBpATdwhGvEkPeaZtcrMVA3c9/pUQYv2o=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -1605,20 +1605,23 @@ $('#aExit').onclick=()=>exitFs();
    وأول ما يكبّر بالقارئ برة ملء الشاشة يطلع تنبيه "ملء الشاشة لجودة أفضل". يطلع مرة وحدة لكل ملزمة إذا سده */
 (function(){
   const vv=window.visualViewport,h=$('#zHint');if(!vv)return;
-  let shut=null,t=0;
-  // وهو يحرك أو يكبّر الشاشة التنبيه يختفي، وأول ما يوقف (ربع ثانية) يطلع ثابت بأسفل الجزء الظاهر، فما يبين يتحرك ويرتجف
-  const place=()=>{
-    const on=$('#read').classList.contains('on')&&!fsOn()&&vv.scale>1.15&&shut!==location.hash;
-    h.hidden=!on;if(!on)return;
-    // بنص الجزء الظاهر وتحت، ويصغر بنفس نسبة الزوم حتى يبين بحجمه الطبيعي
-    h.style.transform=`translate(${vv.offsetLeft+vv.width/2}px,${vv.offsetTop+vv.height-16/vv.scale}px) scale(${1/vv.scale}) translate(-50%,-100%)`;
-    h.style.opacity='1';
+  // أول ما يسوي زوم يطلع التنبيه، ويبقى دائماً بأسفل الشاشة بالنص حتى وهو يسكرل أو يكبّر أو يصغّر، ويختفي بس بالـ ×
+  // (أو إذا فعّل ملء الشاشة أو طلع من الملزمة). مكانه ينحسب كل فريم من الجزء الظاهر من الشاشة، فيبقى بوجهه
+  let shut=null,shown=false,raf=0;
+  const hide=()=>{shown=false;h.hidden=true;cancelAnimationFrame(raf)};
+  const frame=()=>{
+    if(!shown)return;
+    if(!$('#read').classList.contains('on')||fsOn())return hide();
+    h.style.transform=`translate3d(${vv.offsetLeft+vv.width/2}px,${vv.offsetTop+vv.height-16/vv.scale}px,0) scale(${1/vv.scale}) translate(-50%,-100%)`;
+    raf=requestAnimationFrame(frame);
   };
-  const moving=()=>{h.style.opacity='0';clearTimeout(t);t=setTimeout(place,250)};
-  h.style.transition='opacity .2s';
-  vv.addEventListener('resize',moving);vv.addEventListener('scroll',moving);addEventListener('hashchange',()=>{h.hidden=true});
-  $('#zHintX').onclick=()=>{shut=location.hash;h.hidden=true};
-  $('#zHintGo').onclick=()=>{h.hidden=true;$('#rFs').click()};
+  vv.addEventListener('resize',()=>{
+    if(shown||vv.scale<=1.15||!$('#read').classList.contains('on')||fsOn()||shut===location.hash)return;
+    shown=true;h.hidden=false;frame();
+  });
+  addEventListener('hashchange',hide);
+  $('#zHintX').onclick=()=>{shut=location.hash;hide()};
+  $('#zHintGo').onclick=()=>{hide();$('#rFs').click()};
 })();
 // الوضع الفاتح/الغامق للملزمة: نفس الاختيار يبقى للملازم الثانية وبالمرة الجاية (بمتصفح الطالب)
 function setReadTheme(light){
