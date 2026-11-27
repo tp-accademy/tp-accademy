@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-L2662R4KKxgpSsv7JWKK11O4kzzZs9vFMHyWVu1Z6t4=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-+swnkkG62xXiAgG+3zPzD4+L3BqZyOGrCeUXqHOFfIM=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -331,7 +331,7 @@ body.reading{touch-action:pan-x pan-y}
 .anote .nmove{cursor:move}
 #read.full[data-tool=note] .anote{pointer-events:auto;cursor:move}
 .anote.ed{pointer-events:auto;cursor:auto}
-#read.full:not([data-tool=none]) .ann{pointer-events:auto;touch-action:none;cursor:crosshair}
+#read.full:not([data-tool=none]) .ann{pointer-events:auto;touch-action:none;cursor:var(--acur,crosshair)}
 #read.full[data-tool=note] .ann{cursor:text}
 #read.full[data-tool=erase] .ann{cursor:none}
 .ecur{position:fixed;z-index:6;border:1.5px solid #fff;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.6);pointer-events:none;display:none;transform:translate(-50%,-50%)}
@@ -410,6 +410,14 @@ body.reading{touch-action:pan-x pan-y}
 .alec{display:flex;flex-direction:column;gap:6px;margin:12px 0}
 .alec li,.stu li{list-style:none;display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 10px;background:var(--bg2);border:1px solid var(--bd);border-radius:9px}
 .alec li input[type=text]{flex:1;min-width:120px;width:auto;padding:6px 10px}
+/* ترتيب الملازم بالسحب: المسكة ⠿ (ماوس أو لمس)، والملزمة المسحوبة تطفو شوية */
+.lgrip{flex:none;display:grid;place-items:center;width:30px;height:34px;padding:0;border:0;border-radius:7px;background:none;color:var(--mu);cursor:grab;touch-action:none}
+.lgrip svg{width:18px;height:18px}
+.lgrip:hover,.lgrip:focus-visible{color:var(--cy);background:var(--sf2)}
+.alec li.drag{position:relative;z-index:2;border-color:var(--cy);background:var(--sf2);box-shadow:0 8px 24px rgba(0,0,0,.45);transform:scale(1.01)}
+.alec li.drag .lgrip{cursor:grabbing;color:var(--cy)}
+.alec.busy{opacity:.6;pointer-events:none}
+body.lsort,body.lsort *{cursor:grabbing!important;user-select:none}
 .chk{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap}
 .chk input{width:18px;height:18px;accent-color:var(--gr)}
 .btn.sm{padding:6px 12px;font-size:14px}
@@ -1588,6 +1596,15 @@ function setTool(t){
   if(t!=='note')finishEdit();tool=t;rd.dataset.tool=t;if(t!=='none')lastTool=t;
   document.querySelectorAll('.atools [data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t));
   if(t!=='none')setSize(SIZE[t],true);if(t!=='erase')ecur.classList.remove('on');
+  penCursor();
+}
+/* الماوس وقت القلم والهايلايتر: قلم صغير بسيط، رأسه بلون الأداة، ونقطة الرسم رأس القلم (تحت يسار).
+   إطار فاتح حول الخط الغامق حتى يبين على الصفحة الغامقة والفاتحة */
+function penCursor(){
+  const c=/^#[0-9a-f]{6}$/i.test(color)?color:'#F5D547',hl=tool==='hl';
+  const body=hl?'M8.5 15.5 17 7l3.5 3.5-8.5 8.5z':'M5 15.5 16.5 4l3.5 3.5L8.5 19z',tip=hl?'M3 21h5l2.5-2.5-3.5-3.5z':'M2.5 21.5 5 15.5l3.5 3.5z';
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' stroke-linejoin='round' stroke-linecap='round'><g fill='none' stroke='#fff' stroke-width='3.4'><path d='${body}'/><path d='${tip}'/></g><path d='${body}' fill='#16191E' stroke='#16191E' stroke-width='1.4'/><path d='${tip}' fill='${c}' stroke='#16191E' stroke-width='1.4'/></svg>`;
+  rd.style.setProperty('--acur',`url("data:image/svg+xml,${encodeURIComponent(svg)}") ${hl?'3 21':'2 22'}, crosshair`);
 }
 // فتح وسد أدوات التأشير: "تأشير" يفتحها ويرجع آخر أداة، و"تصفح" (أو الطلوع من ملء الشاشة) يسدها
 function setPanel(open){
@@ -1595,7 +1612,7 @@ function setPanel(open){
   if(open&&tool==='none')setTool(lastTool);if(!open&&tool!=='none')setTool('none');
 }
 function setColor(c,quiet){
-  color=c;document.querySelectorAll('[data-color]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.color===c));
+  color=c;document.querySelectorAll('[data-color]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.color===c));penCursor();
   if(!quiet&&editing){editing.x.c=c;editing.pg.querySelector('.ed').style.color=c;annSave()}
 }
 function setEmode(m){emode=m;document.querySelectorAll('[data-emode]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.emode===m))}
@@ -1983,7 +2000,8 @@ function adMal(){
   ${subsOf(c.id).map(s=>`<div class="abox" data-sid="${s.id}">
     <h3><bdi>${esc(s.name)}</bdi><span class="arow"><button class="btn sm" type="button" data-act="sedit">تعديل المادة</button><button class="btn sm danger" type="button" data-act="sdel">حذف المادة</button></span></h3>
     <div class="arow" data-sform hidden style="margin-bottom:10px"><div class="f"><label>اسم المادة</label><input data-f="name" value="${esc(s.name)}"></div><div class="f"><label>وصف قصير</label><input data-f="note" value="${esc(s.note)}"></div><div class="f" style="max-width:110px"><label>الترتيب</label><input data-f="sort" type="number" value="${s.sort}"></div><button class="btn pri sm" type="button" data-act="ssave">احفظ</button></div>
-    <ul class="alec">${lecsOf(s.id).map(l=>`<li data-lid="${l.id}"><input type="text" value="${esc(l.title)}" aria-label="اسم الملزمة" data-act="ltitle"><label class="chk"><input type="checkbox" data-act="lfree"${l.free?' checked':''}>مجانية</label><a class="btn sm" href="#read/${l.id}">افتح</a><button class="btn sm danger" type="button" data-act="ldel">حذف</button></li>`).join('')||'<li class="hint">ماكو ملازم بهاي المادة بعد.</li>'}</ul>
+    ${lecsOf(s.id).length>1?'<p class="hint" style="margin-top:8px">اسحب الملزمة من <b>⠿</b> حتى تغير مكانها، والترتيب ينحفظ وحده.</p>':''}
+    <ul class="alec">${lecsOf(s.id).map(l=>`<li data-lid="${l.id}"><button class="lgrip" type="button" data-grip title="اسحب حتى تغير الترتيب" aria-label="غيّر مكان الملزمة (اسحب، أو الأسهم فوگ وجوة)"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="9" cy="6" r="1.6"/><circle cx="15" cy="6" r="1.6"/><circle cx="9" cy="12" r="1.6"/><circle cx="15" cy="12" r="1.6"/><circle cx="9" cy="18" r="1.6"/><circle cx="15" cy="18" r="1.6"/></svg></button><input type="text" value="${esc(l.title)}" aria-label="اسم الملزمة" data-act="ltitle"><label class="chk"><input type="checkbox" data-act="lfree"${l.free?' checked':''}>مجانية</label><a class="btn sm" href="#read/${l.id}">افتح</a><button class="btn sm danger" type="button" data-act="ldel">حذف</button></li>`).join('')||'<li class="hint">ماكو ملازم بهاي المادة بعد.</li>'}</ul>
     <div class="arow"><div class="f"><label>ارفع ملازم <bdi>PDF</bdi> (تكدر تختار أكثر من ملف، تترتب حسب اسم الملف)</label><input type="file" accept="application/pdf,.pdf" multiple data-f="files"></div><label class="chk"><input type="checkbox" data-f="free"${c.price?'':' checked'}>مجانية</label><button class="btn pri" type="button" data-act="up">ارفع</button></div>
     <p class="hint" data-msg style="margin-top:8px">${esc(note(s.id))}</p>
     <div class="aqz"><h4>الاختبارات</h4>
@@ -2083,6 +2101,49 @@ $('#adBody').addEventListener('change',async e=>{
   if(r.error)alert('ما انحفظ: '+r.error.message);
   await reload();
 });
+/* ترتيب الملازم بالسحب (ماوس أو لمس) من المسكة ⠿، أو بالكيبورد (الأسهم فوگ وجوة على المسكة).
+   الترتيب الجديد ينحفظ بـ lectures.sort (1، 2، 3...)، وبس الملازم اللي تغير مكانها تنحدّث */
+let lDrag=null;
+$('#adBody').addEventListener('pointerdown',e=>{
+  const g=e.target.closest('[data-grip]');if(!g||e.button>0||lDrag)return;
+  e.preventDefault();const li=g.closest('li'),ul=li.parentNode;
+  try{g.setPointerCapture(e.pointerId)}catch{}
+  lDrag={li,ul,id:e.pointerId,was:lOrder(ul)};li.classList.add('drag');document.body.classList.add('lsort');
+});
+$('#adBody').addEventListener('pointermove',e=>{
+  if(!lDrag||e.pointerId!==lDrag.id)return;
+  const {li,ul}=lDrag,y=e.clientY;
+  // ينحط قبل أول ملزمة نصها تحت الماوس، وإذا ماكو يصير الأخير
+  const next=[...ul.children].find(o=>o!==li&&o.dataset.lid&&y<o.getBoundingClientRect().top+o.offsetHeight/2);
+  if(next){if(li.nextElementSibling!==next)ul.insertBefore(li,next)}else if(ul.lastElementChild!==li)ul.appendChild(li);
+  if(y<70)scrollBy(0,-14);else if(y>innerHeight-70)scrollBy(0,14); // سكرول وحده قرب الحافة
+});
+const lEnd=e=>{
+  if(!lDrag||e.pointerId!==lDrag.id)return;
+  const {li,ul,was}=lDrag;lDrag=null;li.classList.remove('drag');document.body.classList.remove('lsort');
+  if(lOrder(ul)!==was)lSave(ul);
+};
+$('#adBody').addEventListener('pointerup',lEnd);$('#adBody').addEventListener('pointercancel',lEnd);
+$('#adBody').addEventListener('keydown',e=>{
+  const g=e.target.closest('[data-grip]');if(!g||!/^Arrow(Up|Down)$/.test(e.key))return;
+  e.preventDefault();const li=g.closest('li'),ul=li.parentNode;
+  if(e.key==='ArrowUp'&&li.previousElementSibling)ul.insertBefore(li,li.previousElementSibling);
+  else if(e.key==='ArrowDown'&&li.nextElementSibling)ul.insertBefore(li.nextElementSibling,li);
+  else return;
+  g.focus();lSave(ul,+li.dataset.lid);
+});
+function lOrder(ul){return [...ul.children].map(x=>x.dataset.lid).filter(Boolean).join()}
+async function lSave(ul,focusId){
+  const sid=+ul.closest('[data-sid]').dataset.sid,ids=[...ul.children].map(x=>+x.dataset.lid).filter(Boolean);
+  const ch=ids.map((id,i)=>({id,sort:i+1})).filter(x=>lecById(x.id)?.sort!==x.sort);
+  if(!ch.length)return;
+  ul.classList.add('busy');
+  const rs=await Promise.all(ch.map(x=>sb.from('lectures').update({sort:x.sort}).eq('id',x.id)));
+  const er=rs.find(r=>r.error);
+  if(er){console.warn(er.error);alert('ما انحفظ الترتيب: '+er.error.message)}else adNote={sid,t:'انحفظ ترتيب الملازم.'};
+  await reload();
+  if(focusId)document.querySelector(`[data-lid="${focusId}"] [data-grip]`)?.focus();
+}
 $('#adBody').addEventListener('click',async e=>{
   const b=e.target.closest('[data-act]');if(!b||b.tagName==='INPUT')return;
   const act=b.dataset.act,box=b.closest('[data-sid]'),s=box&&subById(+box.dataset.sid),c=courseById(adCourse);
