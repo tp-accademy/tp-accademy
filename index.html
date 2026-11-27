@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-IEnBl5756Hs/a5r3VElbbd2bsgWpSAyaHvekYXm2kmc=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-L2662R4KKxgpSsv7JWKK11O4kzzZs9vFMHyWVu1Z6t4=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -459,6 +459,13 @@ body.reading{touch-action:pan-x pan-y}
 .qfb.ok{color:var(--gr)}
 .qfb.no{color:var(--rd)}
 .qfb bdi{color:var(--gr)}
+/* شرح الجواب: يطلع بعد ما يجاوب، بإطار أخضر إذا صح وأحمر إذا غلط */
+.qwhy{margin-top:12px;padding:12px 14px;border-radius:11px;background:rgba(124,199,154,.08);border:1px solid rgba(124,199,154,.35);border-inline-start:4px solid var(--gr)}
+.qwhy.no{background:rgba(214,138,138,.08);border-color:rgba(214,138,138,.35);border-inline-start-color:var(--rd)}
+.qwhy b{display:block;font-size:14px;color:var(--gr);margin-bottom:4px}
+.qwhy.no b{color:var(--rd)}
+.qwhy p{line-height:1.8;font-size:16px;color:var(--tx);unicode-bidi:plaintext}
+.qact .qprev{margin-inline-end:auto}
 .qact{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:16px}
 .qres{text-align:center}
 .qres h3{font-size:20px;margin-bottom:2px}
@@ -541,6 +548,8 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
   /* الاختبار: زر "السؤال الجاي" يلزق بأسفل الشاشة حتى ما تحتاج تنزل كل سؤال */
   .qcard .qact{position:sticky;bottom:10px;z-index:3;margin-top:12px}
   .qcard .qact .btn{flex:1;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+  .qcard .qact .qprev{flex:0 0 auto;margin:0;background:var(--sf2)}
+  .qcard .qact .btn{white-space:nowrap}
   .qres .qact{position:static}
   .qres .qact .btn{flex:1 1 100%;box-shadow:none}
   section{padding:20px 0 26px}
@@ -1793,12 +1802,13 @@ setLang('إنگليزي');renderNames();pShow(1);
 
 /* ===== الاختبارات (#quiz/<id>) =====
    سؤال بكل مرة: mcq = أزرار اختيارات، fill = جملة بيها فراغ (بوكس بيه الاختيارات). الجواب يتلون فوراً: الصح أخضر والغلط أحمر.
-   بالآخر: كم صح، وكم غلط، والغلط من يا ملزمة (src). كل شي بالذاكرة بس، ما ينحفظ بأي مكان. */
+   بعد الجواب يطلع الصح والشرح (e). يرجع للسؤال السابق، بس ما يتقدم قبل ما يجاوب.
+   بالآخر: كم صح، وكم غلط، والغلط من يا ملزمة (src). التقدم ينحفظ بجهاز الطالب بس (qzSave)، مو بـ Supabase. */
 let QZ=null,qzJob=0; // {z, sub, qs, order:[أرقام الأسئلة بهاي الجولة], i, ans:{رقم السؤال: الاختيار}, res}
 const LET='ABCDEF';
 // الأسئلة من قاعدة البيانات تتنظف قبل ما تنعرض: نصوص بس، والجواب الصح رقم ضمن الاختيارات
 function qzClean(d){
-  return (Array.isArray(d)?d:[]).filter(x=>x&&typeof x.q==='string'&&Array.isArray(x.o)).map(x=>({q:x.q.slice(0,2000),o:x.o.slice(0,6).map(o=>String(o).slice(0,500)),a:+x.a,src:typeof x.src==='string'?x.src.slice(0,120):''})).filter(x=>x.o.length>=2&&Number.isInteger(x.a)&&x.a>=0&&x.a<x.o.length);
+  return (Array.isArray(d)?d:[]).filter(x=>x&&typeof x.q==='string'&&Array.isArray(x.o)).map(x=>({q:x.q.slice(0,2000),o:x.o.slice(0,6).map(o=>String(o).slice(0,500)),a:+x.a,src:typeof x.src==='string'?x.src.slice(0,120):'',e:typeof x.e==='string'?x.e.slice(0,1500):''})).filter(x=>x.o.length>=2&&Number.isInteger(x.a)&&x.a>=0&&x.a<x.o.length);
 }
 async function openQuiz(id){
   const job=++qzJob,box=$('#qBody'),msg=(t,act)=>{if(job===qzJob)box.innerHTML=`<div class="empty">${t}${act?`<div class="cta" style="justify-content:center;margin-top:14px">${act}</div>`:''}</div>`};
@@ -1815,7 +1825,42 @@ async function openQuiz(id){
   if(r.error){console.warn(r.error);return msg('ما گدرت أحمّل الاختبار. حدّث الصفحة، وإذا بقت المشكلة راسلنا.')}
   const qs=qzClean(r.data?.questions);
   if(!qs.length)return msg('هذا الاختبار ماكو بيه أسئلة بعد.');
-  QZ={z,sub,qs,order:qs.map((_,k)=>k),i:0,ans:{},res:false};qzShow();
+  const sig=qzSig(qs),sv=qzLoad(id,qs,sig);
+  QZ={z,sub,qs,sig,order:qs.map((_,k)=>k),i:0,ans:{},res:false};
+  if(sv){QZ.saved=sv;return qzAsk()}
+  qzShow();
+}
+/* التقدم ينحفظ بجهاز الطالب بس (localStorage، مو Supabase): ترتيب الأسئلة، وين واصل، واختياراته.
+   sig = بصمة الأسئلة، إذا الأدمن عدّل الاختبار التقدم القديم ينلغي حتى ما تتلخبط الأرقام. */
+const qzKey=id=>`tp-qz:${ME?.user?.id||''}:${id}`; // لكل حساب لحاله لو أكثر من واحد على نفس الجهاز
+function qzSig(qs){let h=0;for(const x of qs){const s=x.q+'|'+x.a+'|'+x.o.length;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0}return qs.length+':'+h}
+function qzSave(drop){
+  if(!QZ)return;
+  try{if(drop||!Object.keys(QZ.ans).length)localStorage.removeItem(qzKey(QZ.z.id));
+    else localStorage.setItem(qzKey(QZ.z.id),JSON.stringify({s:QZ.sig,order:QZ.order,i:QZ.i,ans:QZ.ans}))}catch{}
+}
+function qzLoad(id,qs,sig){
+  try{
+    const v=JSON.parse(localStorage.getItem(qzKey(id))||'null');
+    if(!v||v.s!==sig||!Array.isArray(v.order)||!v.order.length||v.order.length>qs.length)return null;
+    const order=v.order.filter(k=>Number.isInteger(k)&&k>=0&&k<qs.length);
+    if(order.length!==v.order.length||new Set(order).size!==order.length)return null;
+    const ans={};
+    for(const [k,j] of Object.entries(v.ans||{})){const n=+k;if(order.includes(n)&&Number.isInteger(j)&&j>=0&&j<qs[n].o.length)ans[n]=j}
+    if(!Object.keys(ans).length)return null;
+    // ما يكدر يكون بسؤال بعد أول سؤال ما مجاوب (حتى ما يقفز لگدام)
+    const first=order.findIndex(k=>!(k in ans)),lim=first<0?order.length-1:first;
+    return {order,ans,i:Math.min(Math.max(0,Number.isInteger(v.i)?v.i:0),lim)};
+  }catch{return null}
+}
+// رجع للاختبار وعنده تقدم محفوظ: يكمّل من نفس السؤال، أو يبدي من جديد
+function qzAsk(){
+  const {qs,saved:{order,ans,i}}=QZ,done=order.filter(k=>k in ans),wrong=done.filter(k=>ans[k]!==qs[k].a).length;
+  QZ.res=true;
+  $('#qBody').innerHTML=`<div class="qcard qres"><h3>كمّل من وين ما وصلت؟</h3>
+    <p class="qsum">آخر مرة وصلت للسؤال <b class="en">${i+1}</b> من <b class="en">${order.length}</b>. جاوبت <b class="en">${done.length}</b>${wrong?`، وغلطت بـ <b class="en">${wrong}</b>`:''}.</p>
+    <div class="qact" style="justify-content:center"><button class="btn pri" type="button" data-qz="resume">كمّل من السؤال ${i+1}</button><button class="btn" type="button" data-qz="fresh">ابدي من البداية</button></div></div>`;
+  $('#qBody [data-qz=resume]').focus({preventScroll:true});
 }
 function qzShow(){
   const {z,qs,order,i,ans}=QZ,k=order[i],x=qs[k],done=k in ans,right=done&&ans[k]===x.a;
@@ -1829,19 +1874,23 @@ function qzShow(){
     const tf=z.kind==='tf';
     body=`<p class="qq" dir="auto">${esc(x.q)}</p><div class="qopts${tf?' tf':''}" dir="auto">${x.o.map((o,j)=>`<button type="button" class="qo${done?j===x.a?' ok':j===ans[k]?' no':'':''}" data-qz="pick" data-j="${j}"${done?' disabled':''}><b>${tf?(j?'✗':'✓'):LET[j]}</b><span dir="auto">${esc(o)}</span></button>`).join('')}</div>`;
   }
-  const fb=!done?'':right?'<p class="qfb ok">✓ صح</p>':`<p class="qfb no">✗ غلط${z.kind==='fill'?` — الصح: <bdi>${esc(x.o[x.a])}</bdi>`:''}</p>`;
+  // بعد الجواب: صح لو غلط، والجواب الصح، والشرح (x.e) إذا موجود
+  const fb=!done?'':right?'<p class="qfb ok">✓ صح</p>':`<p class="qfb no">✗ غلط — الجواب الصح: <bdi dir="auto">${esc(x.o[x.a])}</bdi></p>`;
+  const why=done&&x.e?`<div class="qwhy${right?'':' no'}"><b>${right?'الشرح':'ليش؟'}</b><p dir="auto">${esc(x.e)}</p></div>`:'';
   $('#qBody').innerHTML=`<div class="qprog"><span>السؤال <b class="en">${i+1}</b> من <b class="en">${order.length}</b></span><button class="mini" type="button" data-qz="end">إنهاء الاختبار</button></div>
     <div class="qbar"><i style="width:${(i+(done?1:0))/order.length*100}%"></i></div>
-    <div class="qcard"><div class="qn">Q${k+1}${x.src?` · ${esc(x.src)}`:''}</div>${body}${fb}
-    <div class="qact">${done?`<button class="btn pri" type="button" data-qz="next">${i+1<order.length?'السؤال الجاي':'شوف النتيجة'}</button>`:''}</div></div>`;
+    <div class="qcard"><div class="qn">Q${k+1}${x.src?` · ${esc(x.src)}`:''}</div>${body}${fb}${why}
+    <div class="qact">${i?'<button class="btn qprev" type="button" data-qz="prev">→ السابق</button>':''}${done?`<button class="btn pri" type="button" data-qz="next">${i+1<order.length?'السؤال الجاي':'شوف النتيجة'}</button>`:''}</div></div>`;
 }
 function qzPick(j){
   const k=QZ.order[QZ.i];if(k in QZ.ans||!(j>=0&&j<QZ.qs[k].o.length))return;
-  QZ.ans[k]=j;qzShow();$('#qBody [data-qz=next]')?.focus({preventScroll:true});
+  QZ.ans[k]=j;qzSave();qzShow();$('#qBody [data-qz=next]')?.focus({preventScroll:true});
 }
+const qzTop=()=>{const t=$('#qBody').getBoundingClientRect().top;if(t<0)window.scrollTo({top:scrollY+t-80,behavior:'instant'})};
 function qzResult(){
   QZ.res=true;
   const {qs,order,ans,sub}=QZ,done=order.filter(k=>k in ans),wrong=done.filter(k=>ans[k]!==qs[k].a),right=done.length-wrong.length,skip=order.length-done.length;
+  qzSave(!skip); // خلص كلشي = يبدي من جديد المرة الجاية. إذا بقت أسئلة يكدر يكمّلها بعدين
   // الغلط مجمّع حسب الملزمة، وإذا بالمادة ملزمة بنفس الاسم يطلع زر يفتحها
   const by=new Map();wrong.forEach(k=>{const s=qs[k].src||'بدون ملزمة';by.has(s)||by.set(s,[]);by.get(s).push(k)});
   const lecOf=s=>lecsOf(sub.id).find(l=>l.title.trim()===s.trim());
@@ -1852,16 +1901,19 @@ function qzResult(){
     <div class="qact">${wrong.length?'<button class="btn pri" type="button" data-qz="wrong">أعد الأسئلة اللي غلطت بيها</button>':''}${skip?'<button class="btn" type="button" data-qz="cont">كمّل من وين ما وصلت</button>':''}<button class="btn" type="button" data-qz="again">أعد الاختبار كله</button></div></div>`;
   window.scrollTo({top:0,behavior:'instant'});
 }
-function qzRestart(order){Object.assign(QZ,{order,i:0,ans:{},res:false});qzShow();window.scrollTo({top:0,behavior:'instant'})}
+function qzRestart(order){Object.assign(QZ,{order,i:0,ans:{},res:false});qzSave(true);qzShow();window.scrollTo({top:0,behavior:'instant'})}
 $('#qBody').addEventListener('click',e=>{
   const b=e.target.closest('[data-qz]');if(!b||!QZ||b.tagName==='SELECT')return;
   const a=b.dataset.qz,{qs,order,ans}=QZ;
   if(a==='pick')return qzPick(+b.dataset.j);
-  if(a==='next'){if(QZ.i+1<order.length){QZ.i++;qzShow();const t=$('#qBody').getBoundingClientRect().top;if(t<0)window.scrollTo({top:scrollY+t-80,behavior:'instant'})}else qzResult();return}
+  // لگدام بس إذا السؤال الحالي متجاوب، ولورا دائماً (يشوف جوابه القديم بدون ما يغيره)
+  if(a==='next'){if(!(order[QZ.i] in ans))return;if(QZ.i+1<order.length){QZ.i++;qzSave();qzShow();qzTop()}else qzResult();return}
+  if(a==='prev'){if(QZ.i>0){QZ.i--;qzSave();qzShow();qzTop()}return}
   if(a==='end')return qzResult();
   if(a==='wrong')return qzRestart(order.filter(k=>k in ans&&ans[k]!==qs[k].a));
-  if(a==='again')return qzRestart(qs.map((_,k)=>k));
-  if(a==='cont'){QZ.res=false;QZ.i=Math.max(0,order.findIndex(k=>!(k in ans)));qzShow()}
+  if(a==='again'||a==='fresh'){delete QZ.saved;return qzRestart(qs.map((_,k)=>k))}
+  if(a==='resume'){Object.assign(QZ,QZ.saved,{res:false});delete QZ.saved;qzShow();return}
+  if(a==='cont'){QZ.res=false;QZ.i=Math.max(0,order.findIndex(k=>!(k in ans)));qzSave();qzShow()}
 });
 $('#qBody').addEventListener('change',e=>{if(e.target.dataset.qz==='pick'&&e.target.value!=='')qzPick(+e.target.value)});
 // بالكيبورد: 1-6 أو A-F تختار، و Enter للسؤال الجاي
@@ -1879,10 +1931,11 @@ function qzParse(text,kind){
   const out=[];
   for(const block of text.replace(/\r/g,'').split(/\n\s*\n/)){
     const ls=block.split('\n').map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'));if(!ls.length)continue;
-    let q=[],o=[],a=[],src='';
+    let q=[],o=[],a=[],src='',ex=[];
     for(const l of ls){
       const m=l.match(QOPT);
       if(l.startsWith('@'))src=l.slice(1).trim();
+      else if(l.startsWith('>')&&q.length)ex.push(l.slice(1).trim());
       else if(kind==='tf'&&q.length&&QTF.test(l))a.push(/^(صح|true|t)$/i.test(l)?0:1);
       else if(kind!=='tf'&&m&&q.length){let t=m[2].trim();if(t.endsWith('*')){a.push(o.length);t=t.slice(0,-1).trim()}o.push(t)}
       else q.push(l);
@@ -1891,14 +1944,14 @@ function qzParse(text,kind){
     const qq=q.join(' ');
     const err=!qq?'ماكو نص للسؤال':kind==='tf'&&a.length!==1?'لازم سطر واحد تحت الجملة بيه "صح" أو "غلط"'
       :o.length<2?'لازم اختيارين أو أكثر':o.length>6?'أكثر شي 6 اختيارات':a.length!==1?'لازم اختيار صح واحد، وعليه * بآخره'
-      :kind==='fill'&&(qq.match(/_{3,}/g)||[]).length!==1?'لازم فراغ واحد ___ بالسؤال':qq.length>2000||o.some(x=>x.length>500)?'النص طويل هواية':src.length>120?'اسم الملزمة طويل':'';
+      :kind==='fill'&&(qq.match(/_{3,}/g)||[]).length!==1?'لازم فراغ واحد ___ بالسؤال':qq.length>2000||o.some(x=>x.length>500)?'النص طويل هواية':src.length>120?'اسم الملزمة طويل':ex.join(' ').length>1500?'الشرح طويل هواية':'';
     if(err)throw new Error(`السؤال ${out.length+1} (${qq.slice(0,40)||'...'}): ${err}`);
-    out.push({q:qq,o,a:a[0],src});
+    const x={q:qq,o,a:a[0],src};if(ex.length)x.e=ex.join(' ');out.push(x);
   }
   if(!out.length)throw new Error('ماكو أسئلة. الصق الأسئلة بالصيغة اللي فوگ.');
   return out;
 }
-const qzText=(qs,kind)=>qs.map(x=>[x.q,...(kind==='tf'?[TF_O[x.a]||'صح']:x.o.map((o,j)=>`${LET[j]}) ${o}${j===x.a?' *':''}`)),...(x.src?[`@ ${x.src}`]:[])].join('\n')).join('\n\n');
+const qzText=(qs,kind)=>qs.map(x=>[x.q,...(kind==='tf'?[TF_O[x.a]||'صح']:x.o.map((o,j)=>`${LET[j]}) ${o}${j===x.a?' *':''}`)),...(x.e?[`> ${x.e}`]:[]),...(x.src?[`@ ${x.src}`]:[])].join('\n')).join('\n\n');
 
 /* ===== لوحة الأدمن (#admin) =====
    الملازم: لكل كورس اسمه وسعره وحالته، ومواده، وبكل مادة ملازمها (رفع PDF، اسم، مجانية/مدفوعة، حذف).
@@ -1941,12 +1994,13 @@ function adMal(){
           <div class="f" style="max-width:220px"><label>النوع</label><select data-f="zkind" style="width:100%"><option value="mcq">اختيار من متعدد (MCQ)</option><option value="fill">إسقاطات (املأ الفراغ)</option><option value="tf">صح وغلط</option></select></div>
           <label class="chk" style="margin-bottom:10px"><input type="checkbox" data-f="zfree"${c.price?'':' checked'}>مجاني</label></div>
         <div class="f" style="margin-top:10px"><label>الأسئلة</label>
-          <small>كل سؤال بسطور لحاله وبين سؤال وسؤال سطر فارغ. الاختيار الصح عليه <b>*</b> بآخره، و <b>@</b> اسم الملزمة اللي منها السؤال (إذا نفس اسم ملزمة بالمادة، النتيجة تطلع زر يفتحها). بالإسقاطات حط <b>___</b> مكان الفراغ. بصح وغلط: الجملة، وتحتها سطر بيه <b>صح</b> أو <b>غلط</b> بس (بدون A B).</small>
+          <small>كل سؤال بسطور لحاله وبين سؤال وسؤال سطر فارغ. الاختيار الصح عليه <b>*</b> بآخره، و <b>@</b> اسم الملزمة اللي منها السؤال (إذا نفس اسم ملزمة بالمادة، النتيجة تطلع زر يفتحها). بالإسقاطات حط <b>___</b> مكان الفراغ. بصح وغلط: الجملة، وتحتها سطر بيه <b>صح</b> أو <b>غلط</b> بس (بدون A B). <br><b>الشرح:</b> تحت الاختيارات سطر يبدي بـ <b>&gt;</b> بيه ليش هذا الجواب هو الصح. يطلع للطالب بعد ما يجاوب (بـ "ليش؟" إذا غلط). السؤال اللي بدون شرح يطلع بيه الجواب الصح بس.</small>
           <pre>Which generation introduced SMS?
 A) 1G
 B) 2G *
 C) 3G
 D) 4G
+> الـ 2G أول جيل رقمي، وويا الرقمي إجت الرسائل النصية SMS.
 @ محاضرة 2
 
 1G signals are analog, while 2G signals are ___.
@@ -2056,7 +2110,8 @@ $('#adBody').addEventListener('click',async e=>{
     return run(async()=>{
       zmsg('جاري تحميل الأسئلة...');
       const r=await sb.from('quiz_data').select('questions').eq('quiz_id',z.id).maybeSingle();if(r.error)throw r.error;
-      zv('zq').value=qzText(qzClean(r.data?.questions),z.kind);zmsg('');
+      const qs=qzClean(r.data?.questions),noEx=qs.filter(x=>!x.e).length;
+      zv('zq').value=qzText(qs,z.kind);zmsg(noEx?`${noEx} من ${qs.length} سؤال بدون شرح. ضيف تحت كل سؤال سطر يبدي بـ > بيه الشرح.`:'');
     });
   }
   if(act==='zcancel'){zf.hidden=true;return}
@@ -2071,7 +2126,8 @@ $('#adBody').addEventListener('click',async e=>{
       else{const r=await sb.from('quizzes').insert({subject_id:s.id,title,kind,free,n:qs.length,sort:quizzesOf(s.id).length+1}).select('id').single();if(r.error)throw r.error;id=r.data.id}
       const d=await sb.from('quiz_data').upsert({quiz_id:id,questions:qs});
       if(d.error){if(isNew)await sb.from('quizzes').delete().eq('id',id);throw d.error}
-      adNote={sid:s.id,t:`انحفظ "${title}" (${qs.length} سؤال).`};await reload();
+      const noEx=qs.filter(x=>!x.e).length;
+      adNote={sid:s.id,t:`انحفظ "${title}" (${qs.length} سؤال${noEx?`، ${noEx} منهن بدون شرح`:'، كلهن بيهن شرح'}).`};await reload();
     });
   }
   if(act==='zdel'){
