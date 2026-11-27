@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <!-- الحماية (CSP): السكربتات بس من ملفات المكتبتين بالضبط + سكربت الصفحة (هاشه يحطه build.py)، والاتصال بس بـ Supabase.
      إذا ضفت مكتبة أو خدمة جديدة لازم تنضاف هنا، وإلا المتصفح يمنعها -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-Imx6n5iTyPQpCobYjo9CPF7jx/5KWTNQjXuoTs4m9B4=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-IEnBl5756Hs/a5r3VElbbd2bsgWpSAyaHvekYXm2kmc=' https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/ https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/; worker-src 'self' blob: https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com data:; img-src 'self' data: blob:; connect-src 'self' https://uetdxrqjuiuckvaxjkps.supabase.co wss://uetdxrqjuiuckvaxjkps.supabase.co; object-src 'none'; base-uri 'none'; form-action 'self'; frame-src 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TP Accademy | تي بي أكاديمي</title>
@@ -848,7 +848,7 @@ footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:1
 <section class="page" id="admin">
   <div class="wrap">
     <div class="sh"><div><h2>لوحة الأدمن</h2><p>ارفع الملازم واحذفها، وحدد المجانية والمدفوعة، وفعّل الكورسات للطلاب اللي دفعوا.</p></div></div>
-    <div class="tabs" role="tablist" id="adTabs"><button class="tab" role="tab" data-ad="mal">الملازم</button><button class="tab" role="tab" data-ad="stu">الطلاب</button></div>
+    <div class="tabs" role="tablist" id="adTabs"><button class="tab" role="tab" data-ad="mal">الملازم</button><button class="tab" role="tab" data-ad="stu">الطلاب</button><button class="tab" role="tab" data-ad="price">الأسعار</button></div>
     <div class="adm" id="adBody"></div>
   </div>
 </section>
@@ -896,6 +896,16 @@ const PRICE = {
   p:{name:'برزنتيشن', base:5000, baseN:5, unit:'سلايد', units:'سلايدات'},
   r:{name:'تقرير', base:2000, baseN:3, unit:'صفحة', units:'صفحات'},
   perUnit:250, secondStudent:500, perStudent:1000, maxN:40};
+/* الأسعار تتعدل من لوحة الأدمن (تبويب "الأسعار")، وتنحفظ بجدول settings بمفتاح 'price'. هنا ننظفها (أرقام صحيحة بس) ونطبقها */
+const PRICE_KEYS=[['p','base'],['p','baseN'],['r','base'],['r','baseN'],[null,'perUnit'],[null,'secondStudent'],[null,'perStudent'],[null,'maxN']];
+function applyPrice(v){
+  if(!v||typeof v!=='object')return;
+  for(const [k,f] of PRICE_KEYS){const src=k?v[k]?.[f]:v[f],n=Math.round(+src);if(Number.isFinite(n)&&n>=0&&n<=10000000)(k?PRICE[k]:PRICE)[f]=n}
+  PRICE.p.baseN=Math.max(1,PRICE.p.baseN);PRICE.r.baseN=Math.max(1,PRICE.r.baseN);PRICE.maxN=Math.max(PRICE.maxN,PRICE.p.baseN,PRICE.r.baseN);
+  priceChanged();
+}
+// بعد ما تتغير الأسعار نحدّث صفحة البرزنتيشن (أسعار "يبدي من" والحساب)
+function priceChanged(){if(typeof pPrice!=='function')return;$('#kpP').textContent=fmt(PRICE.p.base);$('#kpR').textContent=fmt(PRICE.r.base);if(P.kind)setKind(P.kind);else pPrice();if(pStep===4)pReview()}
 /* الكورسات والمواد والملازم صارت بـ Supabase وتتعدل من لوحة الأدمن (#admin) */
 const STAGE_NAMES = ['المرحلة الأولى','المرحلة الثانية','المرحلة الثالثة','المرحلة الرابعة'];
 /* ================================== */
@@ -1014,11 +1024,14 @@ const SITE=location.origin+location.pathname;
 async function loadData(){
   if(!sb){DB.err='ما گدرت أتصل بالموقع، تأكد من النت وحدّث الصفحة.';return}
   const order=(q,...k)=>k.reduce((q,c)=>q.order(c),q);
-  const [c,s,l,z]=await Promise.all([
+  const [c,s,l,z,st]=await Promise.all([
     order(sb.from('courses').select('*'),'stage','idx'),
     order(sb.from('subjects').select('*'),'sort','id'),
     order(sb.from('lectures').select('id,subject_id,title,file_path,orig_name,free,sort'),'sort','id'),
-    order(sb.from('quizzes').select('id,subject_id,title,kind,free,n,sort'),'sort','id')]);
+    order(sb.from('quizzes').select('id,subject_id,title,kind,free,n,sort'),'sort','id'),
+    sb.from('settings').select('value').eq('key','price').maybeSingle()]);
+  // الأسعار من لوحة الأدمن (إذا ماكو أو الجدول ما موجود بعد، تبقى الأسعار الافتراضية اللي بالكود)
+  if(st.error)console.warn('settings',st.error);else if(st.data)applyPrice(st.data.value);
   const e=c.error||s.error||l.error;
   if(e){console.warn(e);DB.err='ما گدرت أحمّل الملازم هسه، حدّث الصفحة بعد شوية.';return}
   // إذا جدول الاختبارات ما موجود بعد (schema.sql ما انعاد) الملازم تبقى شغالة
@@ -1899,7 +1912,7 @@ function renderAdmin(){
   if(!ME)return body.innerHTML='<div class="empty">سجّل دخول بإيميل الأدمن.<div class="cta" style="justify-content:center;margin-top:14px"><button class="btn pri" type="button" data-login="in">تسجيل دخول</button></div></div>';
   if(!ME.admin)return body.innerHTML='<div class="empty">هاي الصفحة للأدمن بس.</div>';
   if(!DB.ok)return body.innerHTML=`<div class="empty">${DB.err||'جاري التحميل...'}</div>`;
-  adTab==='mal'?adMal():adStu();
+  adTab==='mal'?adMal():adTab==='price'?adPrice():adStu();
 }
 function adMal(){
   const c=courseById(adCourse)||DB.courses[0];if(!c)return $('#adBody').innerHTML='<div class="empty">ماكو كورسات. شغّل supabase/schema.sql.</div>';
@@ -1975,6 +1988,27 @@ function adStuList(){
       <span class="chips">${[...has].map(id=>courseById(id)).filter(Boolean).map(c=>`<span class="chip">${nm(c)}<button type="button" data-act="unenr" data-cid="${esc(c.id)}" aria-label="شيل التفعيل" title="شيل التفعيل">×</button></span>`).join('')}</span>
       ${rest.length?`<span class="arow"><select aria-label="الكورس">${rest.map(c=>`<option value="${esc(c.id)}"${c.stage===p.stage?' selected':''}>${nm(c)}</option>`).join('')}</select><button class="btn pri sm" type="button" data-act="enr">فعّل</button></span>`:''}</li>`}).join('')||'<li class="hint">ماكو نتائج.</li>';
 }
+/* تبويب الأسعار: أسعار البرزنتيشن والتقارير، تنحفظ بـ settings وتنطبق على الموقع فوراً (وعند الطلاب بأول تحميل) */
+function adPrice(){
+  const f=(k,lbl,v,hint)=>`<div class="f"><label for="pr-${k}">${lbl}</label><input id="pr-${k}" data-pk="${k}" type="number" inputmode="numeric" min="0" step="1" value="${v}">${hint?`<small>${hint}</small>`:''}</div>`;
+  $('#adBody').innerHTML=`
+  <div class="abox"><h3>البرزنتيشن</h3><div class="grid2">${f('p.base','السعر الأساسي (دينار)',PRICE.p.base)}${f('p.baseN','يشمل كم سلايد',PRICE.p.baseN,'وهذا هم أقل عدد يكدر يختاره')}</div></div>
+  <div class="abox"><h3>التقرير</h3><div class="grid2">${f('r.base','السعر الأساسي (دينار)',PRICE.r.base)}${f('r.baseN','يشمل كم صفحة',PRICE.r.baseN,'وهذا هم أقل عدد يكدر يختاره')}</div></div>
+  <div class="abox"><h3>الزيادات (للثنين)</h3><div class="grid2">
+    ${f('perUnit','كل سلايد أو صفحة زيادة',PRICE.perUnit)}${f('maxN','أكثر عدد سلايدات أو صفحات',PRICE.maxN)}
+    ${f('secondStudent','الطالب الثاني يضيف',PRICE.secondStudent)}${f('perStudent','الثالث وكل طالب بعده يضيف',PRICE.perStudent)}</div>
+    <p class="hint" id="prEx" style="margin-top:6px"></p>
+    <div class="arow" style="margin-top:12px"><button class="btn pri" type="button" data-act="psave">احفظ الأسعار</button></div>
+    <p class="hint" id="prMsg" style="margin-top:8px"></p></div>`;
+  prExample();
+}
+// مثال يتحدث وهو يكتب: برزنتيشن 10 سلايدات لـ 3 طلاب
+function prExample(){
+  const v=k=>Math.max(0,Math.round(+document.querySelector(`[data-pk="${k}"]`)?.value||0));if(!$('#prEx'))return;
+  const n=10,st=3,b=v('p.base'),bn=Math.max(1,v('p.baseN')),tot=b+Math.max(0,n-bn)*v('perUnit')+(st>1?v('secondStudent')+(st-2)*v('perStudent'):0);
+  $('#prEx').innerHTML=`مثال: برزنتيشن <bdi>${n}</bdi> سلايدات لـ <bdi>${st}</bdi> طلاب = <b class="en">${fmt(tot)}</b> دينار`;
+}
+$('#adBody').addEventListener('input',e=>{if(e.target.dataset.pk)prExample()});
 document.querySelectorAll('[data-ad]').forEach(b=>b.onclick=()=>{adTab=b.dataset.ad;$('#adBody').innerHTML='';renderAdmin()});
 $('#adBody').addEventListener('input',e=>{if(e.target.id==='adQ')adStuList()});
 $('#adBody').addEventListener('change',async e=>{
@@ -2000,6 +2034,17 @@ $('#adBody').addEventListener('click',async e=>{
   const act=b.dataset.act,box=b.closest('[data-sid]'),s=box&&subById(+box.dataset.sid),c=courseById(adCourse);
   const run=async(fn)=>{b.disabled=true;try{await fn()}catch(x){console.warn(x);alert('صار خطأ: '+(x.message||x))}b.disabled=false};
   if(act==='sedit')return box.querySelector('[data-sform]').hidden^=1;
+  if(act==='psave'){
+    const v={p:{},r:{}},msg=t=>$('#prMsg').textContent=t;let bad=null;
+    document.querySelectorAll('[data-pk]').forEach(el=>{const n=Math.round(+el.value),[a,b2]=el.dataset.pk.split('.');if(el.value===''||!Number.isFinite(n)||n<0||n>10000000)bad=bad||el;b2?v[a][b2]=n:v[a]=n});
+    if(bad){bad.focus();return msg('اكتب أرقام صحيحة (0 أو أكثر) بكل الخانات.')}
+    if(v.p.baseN<1||v.r.baseN<1)return msg('عدد السلايدات والصفحات الأساسي لازم 1 أو أكثر.');
+    if(v.maxN<Math.max(v.p.baseN,v.r.baseN))return msg('أكثر عدد لازم يكون أكبر من العدد الأساسي.');
+    return run(async()=>{
+      const r=await sb.from('settings').upsert({key:'price',value:v,updated_at:new Date().toISOString()});if(r.error)throw r.error;
+      applyPrice(v);msg('انحفظت الأسعار، وصارت هي المعتمدة بالموقع.');
+    });
+  }
   // الاختبارات: نفس الفورم للجديد والتعديل (dataset.edit = id الاختبار اللي ينعدل)
   const zf=box?.querySelector('[data-zform]'),zv=k=>zf.querySelector(`[data-f=${k}]`),zmsg=t=>zf.querySelector('[data-zmsg]').textContent=t;
   if(act==='znew'||act==='zedit'){
